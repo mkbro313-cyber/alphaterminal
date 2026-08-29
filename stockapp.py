@@ -51,6 +51,55 @@ st.set_page_config(
     initial_sidebar_state="auto"
 )
 
+# भाषा डिक्शनरी (Language Dictionary for Translation)
+LANG_DICT = {
+    "मराठी": {
+        "title": "⚡ अल्फा टर्मिनल प्रो",
+        "subtitle": "इन्स्टिट्यूशनल ट्रेडिंग इंजिन • अपस्टॉक्स लाईव्ह डेटा • एसएमसी डिमांड आणि सप्लाई",
+        "orders_btn": "📑 ऑर्डर्स & निकाल डील्स ⚡",
+        "learning_btn": "📚 शेअर मार्केट लर्निंग हब 💡",
+        "select_univ": "📊 इंडेक्स युनिव्हर्स निवडा:",
+        "select_smart": "🌟 स्मार्ट फंडामेंटल & डील युनिव्हर्स निवडा:",
+        "filter_label": "🎯 क्रायटेरियानुसार फिल्टर करा:",
+        "search_label": "🔍 NSE टिकर सर्च / सिलेक्ट करा:",
+        "capital_label": "💼 भांडवल (₹):",
+        "risk_label": "🛡️ कमाल रिस्क %:",
+        "back_btn": "🔙 डॅशबोर्डवर परत जा",
+        "chart_desk_btn": "📈 प्रोफेसनल ट्रेडिंग चार्ट डेस्क ⚡",
+        "sector_desk_btn": "🏢 सेक्टरल हीटमॅप डेस्क ⚡"
+    },
+    "हिंदी": {
+        "title": "⚡ अल्फा टर्मिनल प्रो",
+        "subtitle": "इंस्टीट्यूशनल ट्रेडिंग इंजन • अपस्टॉक्स लाइव डेटा • एसएमसी डिमांड और सप्लाई",
+        "orders_btn": "📑 ऑर्डर्स & रिजल्ट डील्स ⚡",
+        "learning_btn": "📚 शेयर मार्केट लर्निंग हब 💡",
+        "select_univ": "📊 इंडेक्स यूनिवर्स चुनें:",
+        "select_smart": "🌟 स्मार्ट फंडामेंटल & डील यूनिवर्स चुनें:",
+        "filter_label": "🎯 क्राइटेरिया के अनुसार फ़िल्टर करें:",
+        "search_label": "🔍 NSE टिकर सर्च / सेलेक्ट करें:",
+        "capital_label": "💼 कैपिटल (₹):",
+        "risk_label": "🛡️ अधिकतम रिस्क %:",
+        "back_btn": "🔙 डैशबोर्ड पर वापस जाएं",
+        "chart_desk_btn": "📈 प्रोफेशनल ट्रेडिंग चार्ट डेस्क ⚡",
+        "sector_desk_btn": "🏢 सेक्टरल हीटमैप डेस्क ⚡"
+    },
+    "English": {
+        "title": "⚡ ALPHA TERMINAL PRO",
+        "subtitle": "Institutional Trading Engine • Upstox Live Data Feed • SMC Demand & Supply",
+        "orders_btn": "📑 Orders & Results Deals ⚡",
+        "learning_btn": "📚 Stock Market Learning Hub 💡",
+        "select_univ": "📊 Select Index Universe:",
+        "select_smart": "🌟 Select Smart Fundamental & Deal Universe:",
+        "filter_label": "🎯 Filter by Criteria:",
+        "search_label": "🔍 Search / Select NSE Ticker:",
+        "capital_label": "💼 Capital (₹):",
+        "risk_label": "🛡️ Max Risk %:",
+        "back_btn": "🔙 Back to Terminal Dashboard",
+        "chart_desk_btn": "📈 Open Professional Trading Chart Desk ⚡",
+        "sector_desk_btn": "🏢 Sectoral Heatmap Desk ⚡"
+    }
+}
+
 # २. Zerodha स्टाईल अडॅप्टिव्ह थीम CSS
 st.markdown("""
 <style>
@@ -716,6 +765,16 @@ if "smart_watchlist_toggle" not in st.session_state:
     st.session_state["smart_watchlist_toggle"] = False
 if "filtered_watchlist" not in st.session_state:
     st.session_state["filtered_watchlist"] = ALL_NIFTY_SYMBOLS[:50]
+if "selected_lang" not in st.session_state:
+    st.session_state["selected_lang"] = "मराठी"
+
+# भाषा निवडण्यासाठी वर कॉर्नरमध्ये सिलेक्टर्स
+top_lang_col1, top_lang_col2, top_lang_col3 = st.columns([4, 1.5, 1.5])
+with top_lang_col3:
+    chosen_lang = st.selectbox("🌐 Language / भाषा:", ["मराठी", "हिंदी", "English"], index=0, key="lang_selector_box")
+    st.session_state["selected_lang"] = chosen_lang
+
+lang = LANG_DICT[st.session_state["selected_lang"]]
 
 if not st.session_state["smart_watchlist_toggle"]:
     global_selected_pool = tuple(ALL_NIFTY_SYMBOLS[:50])
@@ -730,18 +789,18 @@ else:
 
 head_col1, head_col2, head_col3 = st.columns([3.2, 1.4, 1.4])
 with head_col1:
-    st.title("⚡ ALPHA TERMINAL PRO")
-    st.caption("Institutional Trading Engine • Upstox Live Data Feed • SMC Demand & Supply")
+    st.title(lang["title"])
+    st.caption(lang["subtitle"])
 with head_col2:
     st.write("")
     if st.session_state["view_mode"] not in ["deals_tracker"]:
-        if st.button("📑 ऑर्डर्स & निकाल डील्स ⚡", use_container_width=True):
+        if st.button(lang["orders_btn"], use_container_width=True):
             st.session_state["view_mode"] = "deals_tracker"
             st.rerun()
 with head_col3:
     st.write("")
     if st.session_state["view_mode"] not in ["learning_hub", "guide_viewer"]:
-        if st.button("📚 शेअर मार्केट लर्निंग हब 💡", use_container_width=True):
+        if st.button(lang["learning_btn"], use_container_width=True):
             st.session_state["view_mode"] = "learning_hub"
             st.rerun()
 
@@ -763,7 +822,7 @@ if st.session_state["view_mode"] == "dashboard":
     with sc_col1:
         if not use_smart_lists:
             idx_choice = st.selectbox(
-                "📊 इंडेक्स युनिव्हर्स निवडा:",
+                lang["select_univ"],
                 [
                     "Nifty 50 (टॉप ५० शेअर्स)", 
                     "Nifty 100 (टॉप १०० शेअर्स)", 
@@ -782,7 +841,7 @@ if st.session_state["view_mode"] == "dashboard":
                 selected_pool = tuple(ALL_NIFTY_SYMBOLS)
         else:
             smart_choice = st.selectbox(
-                "🌟 स्मार्ट फंडामेंटल & डील युनिव्हर्स निवडा:",
+                lang["select_smart"],
                 [
                     "🏛️ FII / DII Heavy Buying Universe",
                     "📊 Quarterly Best Results Universe",
@@ -813,7 +872,7 @@ if st.session_state["view_mode"] == "dashboard":
         ]
 
         flt_choice = st.selectbox(
-            "🎯 क्रायटेरियानुसार फिल्टर करा:",
+            lang["filter_label"],
             filter_options,
             index=0
         )
@@ -893,16 +952,16 @@ if st.session_state["view_mode"] == "dashboard":
 
         with col_in1:
             st.text_input(
-                "🔍 NSE टिकर सर्च / सिलेक्ट करा:",
+                lang["search_label"],
                 value=st.session_state["active_ticker"],
                 key="manual_search_key",
                 on_change=on_search_type
             )
 
         with col_in2:
-            user_capital = st.number_input("💼 भांडवल (₹):", min_value=1000, max_value=10000000, value=50000, step=5000)
+            user_capital = st.number_input(lang["capital_label"], min_value=1000, max_value=10000000, value=50000, step=5000)
         with col_in3:
-            risk_pct = st.selectbox("🛡️ कमाल रिस्क %:", [1.0, 1.5, 2.0, 3.0], index=1)
+            risk_pct = st.selectbox(lang["risk_label"], [1.0, 1.5, 2.0, 3.0], index=1)
 
 active_ticker = st.session_state["active_ticker"]
 
@@ -1241,7 +1300,7 @@ if st.session_state.get('data_ready', False):
     if st.session_state["view_mode"] == "deals_tracker":
         b_c1, b_c2 = st.columns([1.5, 4.5])
         with b_c1:
-            if st.button("🔙 Back to Terminal Dashboard", use_container_width=True):
+            if st.button(lang["back_btn"], use_container_width=True):
                 st.session_state["view_mode"] = "dashboard"
                 st.rerun()
         with b_c2:
@@ -1413,7 +1472,7 @@ if st.session_state.get('data_ready', False):
     elif st.session_state["view_mode"] == "learning_hub":
         b_c1, b_c2 = st.columns([1.5, 4.5])
         with b_c1:
-            if st.button("🔙 Back to Terminal Dashboard", use_container_width=True):
+            if st.button(lang["back_btn"], use_container_width=True):
                 st.session_state["view_mode"] = "dashboard"
                 st.rerun()
         with b_c2:
@@ -1728,13 +1787,13 @@ if st.session_state.get('data_ready', False):
     elif st.session_state["view_mode"] == "chart_desk":
         b_col1, b_col2, b_col3 = st.columns([1.5, 3.5, 1.8])
         with b_col1:
-            if st.button("🔙 Back to Intelligence", use_container_width=True):
+            if st.button(lang["back_btn"], use_container_width=True):
                 st.session_state["view_mode"] = "dashboard"
                 st.rerun()
         with b_col2:
             st.markdown(f"<h3 style='margin:0; color:#38bdf8;'>📈 {company_name} — Professional Chart Desk</h3>", unsafe_allow_html=True)
         with b_col3:
-            if st.button("🏢 Sectoral Heatmap Desk ⚡", use_container_width=True):
+            if st.button(lang["sector_desk_btn"], use_container_width=True):
                 st.session_state["view_mode"] = "sector_desk"
                 st.rerun()
 
@@ -2102,7 +2161,7 @@ if st.session_state.get('data_ready', False):
         st.divider()
         c_btn_c1, c_btn_c2, c_btn_c3 = st.columns([1, 2.5, 1])
         with c_btn_c2:
-            if st.button("📈 Open Professional Trading Chart Desk ⚡", use_container_width=True):
+            if st.button(lang["chart_desk_btn"], use_container_width=True):
                 st.session_state["view_mode"] = "chart_desk"
                 st.rerun()
 
@@ -2187,7 +2246,7 @@ if st.session_state.get('data_ready', False):
                 
                 st.markdown(f"""
                 - **P/E Ratio:** <b style="font-size:18px;">{f'{pe_val:.2f}' if pe_val else 'N/A'}</b><br>
-                - **Price to Book (P/B):** <b style="font-size:18px;">{f'{pb_val:.2f}' if pb_val else 'N/A'}</b><br>
+                - **Price to Book (P/B):</b> <b style="font-size:18px;">{f'{pb_val:.2f}' if pb_val else 'N/A'}</b><br>
                 - **डिव्हिडंड यील्ड (Yield):** <b style="font-size:18px;">{f'{div_val*100:.2f}%' if div_val else '0.0%'}</b>
                 """, unsafe_allow_html=True)
 
