@@ -194,13 +194,6 @@ st.markdown("""
         padding: 16px 20px;
         margin-top: 14px;
     }
-    .confluence-badge {
-        background: linear-gradient(135deg, rgba(234, 179, 8, 0.25) 0%, rgba(16, 185, 129, 0.25) 100%);
-        border: 1.5px solid #eab308;
-        border-radius: 10px;
-        padding: 12px 18px;
-        margin-bottom: 14px;
-    }
     .deal-card-blue {
         background: linear-gradient(135deg, rgba(2, 132, 199, 0.15) 0%, rgba(16, 185, 129, 0.15) 100%);
         border: 1px solid rgba(56, 189, 248, 0.6);
@@ -1662,7 +1655,7 @@ if st.session_state.get('data_ready', False):
     elif st.session_state["view_mode"] == "sector_desk":
         b_c1, b_c2 = st.columns([1.5, 4.5])
         with b_c1:
-            if st.button(lang["back_btn"], use_container_width=True):
+            if st.button("🔙 Back to Chart Desk", use_container_width=True):
                 st.session_state["view_mode"] = "chart_desk"
                 st.rerun()
         with b_c2:
@@ -2131,19 +2124,6 @@ if st.session_state.get('data_ready', False):
             </p>
         </div>
         """, unsafe_allow_html=True)
-
-        if confluence_count >= 4:
-            st.markdown(f"""
-            <div class="confluence-badge">
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <span style="font-weight:900; font-size:18px; color:#eab308;">💎 5-STAR INSTITUTIONAL CONFLUENCE SETUP</span>
-                    <span style="font-weight:800; font-size:15px; color:#10b981;">Confluence Score: {confluence_count}/5 ⭐⭐⭐⭐⭐</span>
-                </div>
-                <div style="font-size:14px; margin-top:6px;">
-                    🔥 <b>स्मार्ट मनी सिग्नल:</b> हा शेअर SMC Demand Zone, 20/50 EMA डायनॅमिक सपोर्ट आणि मोमेंटम RSI वर एकाच वेळी मजबूत खरेदी क्षेत्रात आहे.
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
 
         range_span = high_52w - low_52w
         pointer_pos = ((curr_price - low_52w) / range_span) * 100 if range_span > 0 else 50
