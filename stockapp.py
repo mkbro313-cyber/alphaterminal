@@ -928,10 +928,13 @@ if ('loaded_stock' not in st.session_state) or (st.session_state.get('loaded_sto
             nifty_hist = yf.Ticker("^NSEI", session=session).history(period="5d", interval="1d")
             vix_hist = yf.Ticker("^INDIAVIX", session=session).history(period="5d", interval="1d")
 
-            if daily_hist.empty or len(daily_hist) < 20:
-                daily_hist = yf.download(active_ticker, period="2y", interval="1d", progress=False)
-                weekly_hist = yf.download(active_ticker, period="5y", interval="1wk", progress=False)
-                monthly_hist = yf.download(active_ticker, period="max", interval="1mo", progress=False)
+            if daily_hist.empty or len(daily_hist) < 10:
+                active_ticker = "HDFCBANK.NS"
+                st.session_state["active_ticker"] = active_ticker
+                stock = yf.Ticker(active_ticker, session=session)
+                daily_hist = stock.history(period="2y", interval="1d")
+                weekly_hist = stock.history(period="5y", interval="1wk")
+                monthly_hist = stock.history(period="max", interval="1mo")
 
             for df in [daily_hist, weekly_hist, monthly_hist]:
                 if isinstance(df.columns, pd.MultiIndex):
@@ -966,8 +969,8 @@ if ('loaded_stock' not in st.session_state) or (st.session_state.get('loaded_sto
 
             stock_news = fetch_authentic_live_news(active_ticker, company_clean)
 
-        if daily_hist.empty or len(daily_hist) < 20:
-            st.error(f"{active_ticker} चा डेटा उपलब्ध नाही. कृपया अचूक टिकर निवडा.")
+        if daily_hist.empty or len(daily_hist) < 10:
+            st.error(f"{active_ticker} चा डेटा उपलब्ध नाही. कृपया वर सर्च बॉक्समधून दुसरा शेअर निवडा.")
             st.session_state['data_ready'] = False
         else:
             st.session_state['daily_hist'] = daily_hist
@@ -985,7 +988,6 @@ if ('loaded_stock' not in st.session_state) or (st.session_state.get('loaded_sto
             st.session_state['data_ready'] = True
 
     except Exception as e:
-        st.error(f"विश्लेषण त्रुटी: {e}")
         st.session_state['data_ready'] = False
 
 if st.session_state.get('data_ready', False):
@@ -1968,8 +1970,11 @@ if st.session_state.get('data_ready', False):
                 use_container_width=True, 
                 config={
                     'scrollZoom': True,
-                    'displayModeBar': False,
-                    'doubleClick': 'reset'
+                    'displayModeBar': True,
+                    'displaylogo': False,
+                    'modeBarButtonsToRemove': ['lasso2d', 'select2d'],
+                    'doubleClick': 'reset',
+                    'toImageButtonOptions': {'format': 'png', 'filename': 'AlphaTerminal_Chart'}
                 }
             )
 
