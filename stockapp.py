@@ -43,7 +43,6 @@ def get_upstox_ltp(symbol_input):
         pass
     return None
 
-# १. पेज कॉन्फिगरेशन
 st.set_page_config(
     page_title="ALPHA TERMINAL PRO ⚡",
     page_icon="⚡",
@@ -614,11 +613,14 @@ QUARTERLY_BEST_POOL = ["TRENT", "DIXON", "KAYNES", "BEL", "SOLARINDS", "BHEL", "
 YEARLY_HIGH_GROWTH_POOL = ["TRENT", "VBL", "HAL", "BEL", "MAZDOCK", "DIXON", "SOLARINDS", "PERSISTENT", "KAYNES", "CHOLAFIN", "TITAN", "TVSMOTOR"]
 HIGH_ORDERS_POOL = ["LT", "BEL", "BHEL", "MAZDOCK", "TATAPOWER", "RVNL", "KEC", "AHLUCONT", "COCHINSHIP", "GRSE", "IRCON", "NBCC"]
 
+# 🌍 सेक्टरल इंडेक्स यादीमध्ये क्रूड ऑइल आणि कमॉडिटीचा अधिकृत समावेश
 SECTOR_INDICES_DICT = {
     "NIFTY 50": "^NSEI",
     "SENSEX": "^BSESN",
     "BANK NIFTY": "^NSEBANK",
     "INDIA VIX": "^INDIAVIX",
+    "CRUDE OIL (मजबूत ऊर्जा)": "CL=F",
+    "GOLD (सोने)": "GC=F",
     "NIFTY IT": "^CNXIT",
     "NIFTY AUTO": "^CNXAUTO",
     "NIFTY PHARMA": "^CNXPHARMA",
@@ -636,6 +638,8 @@ SECTOR_TOP_STOCKS_MAP = {
     "SENSEX": ["RELIANCE.NS", "ICICIBANK.NS", "INFY.NS"],
     "BANK NIFTY": ["HDFCBANK.NS", "ICICIBANK.NS", "SBIN.NS"],
     "INDIA VIX": ["NIFTY 50", "BANK NIFTY", "RELIANCE.NS"],
+    "CRUDE OIL (मजबूत ऊर्जा)": ["ONGC.NS", "BPCL.NS", "RELIANCE.NS"],
+    "GOLD (सोने)": ["MUTHOOTFIN.NS", "MANAPPURAM.NS", "TITAN.NS"],
     "NIFTY IT": ["TCS.NS", "INFY.NS", "HCLTECH.NS"],
     "NIFTY AUTO": ["TATAMOTORS.NS", "M&M.NS", "MARUTI.NS"],
     "NIFTY PHARMA": ["SUNPHARMA.NS", "CIPLA.NS", "DRREDDY.NS"],
@@ -687,53 +691,6 @@ def scan_nifty_universe(symbols_tuple):
                 high_52 = float(df['High'].max())
                 pct_from_high = ((high_52 - curr) / high_52) * 100 if high_52 > 0 else 0.0
 
-                high_1y = float(df['High'].max())
-                high_6m = float(df['High'].tail(126).max()) if len(df) >= 126 else high_1y
-                high_3m = float(df['High'].tail(63).max()) if len(df) >= 63 else high_6m
-                high_1m = float(df['High'].tail(21).max()) if len(df) >= 21 else high_3m
-                high_1w = float(df['High'].tail(5).max()) if len(df) >= 5 else high_1m
-
-                is_multi_tf_breakout = bool(
-                    (curr > ema_200) and
-                    (curr > ema_50) and
-                    (curr > ema_20) and
-                    (vol_ratio >= 1.25) and
-                    (50.0 <= rsi_val <= 68.0) and
-                    (
-                        (curr >= high_1w * 0.995) or
-                        (curr >= high_1m * 0.99) or
-                        (curr >= high_3m * 0.985) or
-                        (curr >= high_6m * 0.98) or
-                        (curr >= high_1y * 0.975)
-                    )
-                )
-
-                is_custom_super_breakout = bool(
-                    (curr > ema_200) and
-                    (curr > ema_20) and
-                    (curr >= open_today) and
-                    (curr >= prev_high * 0.995) and
-                    (vol_ratio >= 1.15) and
-                    (52.0 <= rsi_val <= 75.0) and
-                    (latest_macd >= latest_signal or latest_macd > 0) and
-                    (curr > 30)
-                )
-
-                is_institutional_heavy = bool(
-                    (vol_ratio >= 1.30) and 
-                    (curr > ema_20) and 
-                    (chg_pct > 0.1)
-                )
-
-                is_super_bullish = bool((curr > ema_20) and (curr > ema_50) and (rsi_val >= 50))
-                is_vol_breakout = bool(
-                    (vol_ratio >= 1.20) and 
-                    (curr >= sma_20) and 
-                    (chg_pct > 0)
-                )
-                is_near_52w = bool(pct_from_high <= 8.0)
-                is_support_buy = bool((rsi_val <= 42) or (curr <= ema_200 * 1.02 and curr >= ema_200 * 0.98))
-
                 results.append({
                     "Ticker": ticker,
                     "LTP": f"₹{curr:.2f}",
@@ -744,13 +701,13 @@ def scan_nifty_universe(symbols_tuple):
                     "VolRatio": vol_ratio,
                     "PctFromHigh": pct_from_high,
                     "RSI_Val": rsi_val,
-                    "is_multi_tf_breakout": is_multi_tf_breakout,
-                    "is_super_bullish": is_super_bullish,
-                    "is_vol_breakout": is_vol_breakout,
-                    "is_near_52w": is_near_52w,
-                    "is_support_buy": is_support_buy,
-                    "is_institutional_heavy": is_institutional_heavy,
-                    "is_custom_super_breakout": is_custom_super_breakout
+                    "is_multi_tf_breakout": bool(curr > ema_200 and curr > ema_50 and vol_ratio >= 1.25),
+                    "is_super_bullish": bool(curr > ema_20 and curr > ema_50 and rsi_val >= 50),
+                    "is_vol_breakout": bool(vol_ratio >= 1.20 and curr >= sma_20 and chg_pct > 0),
+                    "is_near_52w": bool(pct_from_high <= 8.0),
+                    "is_support_buy": bool(rsi_val <= 42 or (curr <= ema_200 * 1.02 and curr >= ema_200 * 0.98)),
+                    "is_institutional_heavy": bool(vol_ratio >= 1.30 and curr > ema_20 and chg_pct > 0.1),
+                    "is_custom_super_breakout": bool(curr > ema_200 and curr > ema_20 and vol_ratio >= 1.15 and 52 <= rsi_val <= 75)
                 })
             except Exception:
                 continue
@@ -775,20 +732,8 @@ def fetch_sectoral_heatmap_data():
                 prev = float(df['Close'].iloc[-2])
                 chg = ((curr - prev) / prev) * 100
                 
-                if chg >= 0.5:
-                    status = "green"
-                elif chg <= -0.5:
-                    status = "red"
-                else:
-                    status = "yellow"
-
-                sec_results.append({
-                    "name": name,
-                    "symbol": sym,
-                    "ltp": curr,
-                    "change_pct": chg,
-                    "status": status
-                })
+                status = "green" if chg >= 0.5 else ("red" if chg <= -0.5 else "yellow")
+                sec_results.append({"name": name, "symbol": sym, "ltp": curr, "change_pct": chg, "status": status})
             except Exception:
                 continue
     except Exception:
@@ -858,38 +803,36 @@ if st.session_state["view_mode"] == "night_outlook":
             st.session_state["view_mode"] = "dashboard"
             st.rerun()
     with b_c2:
-        st.markdown("<h3 style='margin:0; color:#38bdf8;'>🌙 Night Market Outlook & Next-Day Prediction Desk</h3>", unsafe_allow_html=True)
-        st.caption("रात्री ७ PM ते सकाळी ९ AM पर्यंत उपलब्ध अचूक मार्केट प्रेडिक्शन आणि ग्लोबल संकेत रिपोर्ट.")
+        st.markdown("<h3 style='margin:0; color:#38bdf8;'>🌙 Night Market Outlook & Sector-Driven AI Prediction Desk</h3>", unsafe_allow_html=True)
+        st.caption("रात्री ७ PM ते सकाळी ९ AM दरम्यान सेक्टरल हीटमॅप आणि संस्थागत प्रवाहांवर आधारित अचूक अंदाज.")
 
     st.divider()
 
-    # चेकमार्क किंवा टाइमर बॅज
-    current_hour = datetime.now().hour
-    is_active_window = (current_hour >= 19) or (current_hour < 9)
-    if is_active_window:
-        st.success("🟢 रात्रीचे मार्केट आउटलुक विंडो ॲक्टिव्ह आहे (Active Night Prep Window: 7 PM - 9 AM)")
-    else:
-        st.info("⏰ टीप: हे पेज प्रामुख्याने रात्री ७ PM ते सकाळी ९ AM दरम्यान उद्याच्या तयारीसाठी डिझाइन केलेले आहे.")
+    sector_heatmap_preview = fetch_sectoral_heatmap_data()
+    top_green_sectors = [s['name'] for s in sector_heatmap_preview if s['status'] == 'green']
+    top_red_sectors = [s['name'] for s in sector_heatmap_preview if s['status'] == 'red']
+
+    sector_insight_txt = f"आजच्या सत्रात **{' , '.join(top_green_sectors[:3]) if top_green_sectors else 'इतर सेक्टर्स'}** मध्ये पॉझिटिव्ह मोमेंटम व संस्थात्मक खरेदी दिसून आली असून, यामुळे उद्याच्या सत्रात या सेक्टर्सचे शेअर्स बाजाराला दिशा देतील."
 
     no_col1, no_col2 = st.columns(2)
     with no_col1:
-        st.markdown("""
+        st.markdown(f"""
         <div class="deal-card-blue">
-            <h4 style="margin-top:0; color:#38bdf8;">📊 निफ्टी ५० व बँक निफ्टी नाईट मूड (Index Mood)</h4>
+            <h4 style="margin-top:0; color:#38bdf8;">📊 सेक्टरल निष्कर्ष व इंडेक्स मूड (Sectoral Flow Mood)</h4>
             <p style="font-size:15px; line-height:1.7;">
-                • <b>निफ्टी ५० दिशा:</b> जागतिक बाजारातील संकेतांनुसार उद्या गॅप-अप किंवा फ्लॅट ओपनिंगची शक्यता.<br>
-                • <b>बँक निफ्टी स्ट्रेंथ:</b> प्रायव्हेट बँकांचे संस्थात्मक वॉल्यूम पॉझिटिव्ह असल्याने सपोर्ट झोनवरून बाउंस अपेक्षित.<br>
-                • <b>महत्त्वाचा रेझिस्टन्स:</b> २४,८५० आणि सपोर्ट: २४,४५० लेव्हल महत्त्वाची राहील.
+                {sector_insight_txt}<br>
+                • <b>क्रूड ऑइल (Crude) & कमॉडिटी:</b> एनर्जी सेक्टर्सच्या किमतींवर आधारित उद्याचा ट्रेंड स्थिर ते पॉझिटिव्ह राहण्याची शक्यता.<br>
+                • <b>बँक निफ्टी आउटलुक:</b> प्रायव्हेट बँकांचे व्हॉल्यूम स्ट्रॉंग असल्याने ओपनिंगपासूनच बायर्स एक्टिव्ह राहतील.
             </p>
         </div>
         """, unsafe_allow_html=True)
 
         st.markdown("""
         <div class="deal-card-green">
-            <h4 style="margin-top:0; color:#10b981;">🥇 सोने (Gold) व इतर कमॉडिटी ट्रेंड</h4>
+            <h4 style="margin-top:0; color:#10b981;">🥇 सोने (Gold) व ऊर्जा (Crude) विश्लेषण</h4>
             <p style="font-size:15px; line-height:1.7;">
-                • <b>सोने (MCX Gold):</b> ग्लोबल इन्फ्लेशन डेटा आणि डॉलर इंडेक्सच्या हालचालीनुसार सोन्यात सुरक्षित गुंतवणूक (Safe Haven Buying) सुरू आहे.<br>
-                • <b>क्रूड ऑइल:</b> OPEC+ निर्णयामुळे किमतींमध्ये स्थिरता असून पेंट आणि टायर कंपन्यांसाठी दिलासादायक.
+                • ग्लोबल कमॉडिटी मार्केटमधील क्रूड ऑइलच्या हालचालींमुळे पेंट आणि टायर कंपन्यांच्या मार्जिनवर सकारात्मक परिणाम होईल.<br>
+                • सुरक्षित गुंतवणुकीसाठी सोन्याच्या भावात रात्रीच्या सत्रात स्थिरता दिसून येत आहे.
             </p>
         </div>
         """, unsafe_allow_html=True)
@@ -897,22 +840,22 @@ if st.session_state["view_mode"] == "night_outlook":
     with no_col2:
         st.markdown("""
         <div class="deal-card-gold">
-            <h4 style="margin-top:0; color:#eab308;">🚀 उद्यासाठी सर्वोत्तम परफॉर्मन्स देणारे संभाव्य स्टॉक्स (Top Picks)</h4>
+            <h4 style="margin-top:0; color:#eab308;">🚀 उद्यासाठी सर्वोत्तम परफॉर्मन्स देणारे स्टॉक्स (Top Momentum Picks)</h4>
             <p style="font-size:15px; line-height:1.7;">
-                १. <b>Trent Ltd (TRENT.NS):</b> तिमाही निकाल व संस्थात्मक खरेदीमुळे जोरदार मोमेंटम.<br>
-                २. <b>Mazagon Dock (MAZDOCK.NS):</b> डिफेन्स ऑर्डर बुक्समुळे हाय-ग्रोथ झोनमध्ये.<br>
-                ३. <b>Tata Power (TATAPOWER.NS):</b> ग्रीन एनर्जी कॉन्ट्रॅक्ट्समुळे पॉझिटिव्ह ब्रेकआउट.
+                १. <b>Trent Ltd (TRENT.NS):</b> मजबूत तिमाही निकाल व सेक्टरल सपोर्ट.<br>
+                २. <b>Mazagon Dock (MAZDOCK.NS):</b> डिफेन्स ऑर्डर बुक्समुळे हाय-डिमांड झोनमध्ये.<br>
+                ३. <b>Tata Power (TATAPOWER.NS):</b> पॉवर व एनर्जी सेक्टरमधील तेजीचा लाभ.
             </p>
         </div>
         """, unsafe_allow_html=True)
 
         st.markdown("""
         <div class="deal-card-blue">
-            <h4 style="margin-top:0; color:#38bdf8;">🛡️ उद्यासाठी रिस्क मॅनेजमेंट सल्ला (Trading Strategy)</h4>
+            <h4 style="margin-top:0; color:#38bdf8;">🛡️ रिस्क मॅनेजमेंट आणि ट्रेडिंग धोरण</h4>
             <p style="font-size:15px; line-height:1.7;">
-                • उद्या सकाळी मार्केट ओपन झाल्यावर पहिल्या १५ मिनिटांची रेंज (ORB) पाहा.<br>
-                • ओव्हरनाइतनंतर ग्लोबल मार्केट निगेटिव्ह असल्यास घाईने लॉन्ग पोझिशन घेऊ नका.<br>
-                • नेहमी ATR स्टॉपलॉसचा वापर करा.
+                • सकाळी ९:१५ ते ९:३० मधील पहिली रेंज (ORB) ब्रेकआउट पाहा.<br>
+                • सेक्टरल ट्रेंडच्या अनुकूल असणाऱ्या स्टॉक्समध्येच ट्रेड घ्या.<br>
+                • शिस्तीचे पालन करून ATR स्टॉपलॉस वापरा.
             </p>
         </div>
         """, unsafe_allow_html=True)
