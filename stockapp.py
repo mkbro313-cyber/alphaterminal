@@ -613,13 +613,12 @@ QUARTERLY_BEST_POOL = ["TRENT", "DIXON", "KAYNES", "BEL", "SOLARINDS", "BHEL", "
 YEARLY_HIGH_GROWTH_POOL = ["TRENT", "VBL", "HAL", "BEL", "MAZDOCK", "DIXON", "SOLARINDS", "PERSISTENT", "KAYNES", "CHOLAFIN", "TITAN", "TVSMOTOR"]
 HIGH_ORDERS_POOL = ["LT", "BEL", "BHEL", "MAZDOCK", "TATAPOWER", "RVNL", "KEC", "AHLUCONT", "COCHINSHIP", "GRSE", "IRCON", "NBCC"]
 
-# 🌍 सेक्टरल इंडेक्स यादीमध्ये क्रूड ऑइल आणि कमॉडिटीचा अधिकृत समावेश
 SECTOR_INDICES_DICT = {
     "NIFTY 50": "^NSEI",
     "SENSEX": "^BSESN",
     "BANK NIFTY": "^NSEBANK",
     "INDIA VIX": "^INDIAVIX",
-    "CRUDE OIL (मजबूत ऊर्जा)": "CL=F",
+    "CRUDE OIL (ऊर्जा)": "CL=F",
     "GOLD (सोने)": "GC=F",
     "NIFTY IT": "^CNXIT",
     "NIFTY AUTO": "^CNXAUTO",
@@ -638,7 +637,7 @@ SECTOR_TOP_STOCKS_MAP = {
     "SENSEX": ["RELIANCE.NS", "ICICIBANK.NS", "INFY.NS"],
     "BANK NIFTY": ["HDFCBANK.NS", "ICICIBANK.NS", "SBIN.NS"],
     "INDIA VIX": ["NIFTY 50", "BANK NIFTY", "RELIANCE.NS"],
-    "CRUDE OIL (मजबूत ऊर्जा)": ["ONGC.NS", "BPCL.NS", "RELIANCE.NS"],
+    "CRUDE OIL (ऊर्जा)": ["ONGC.NS", "BPCL.NS", "RELIANCE.NS"],
     "GOLD (सोने)": ["MUTHOOTFIN.NS", "MANAPPURAM.NS", "TITAN.NS"],
     "NIFTY IT": ["TCS.NS", "INFY.NS", "HCLTECH.NS"],
     "NIFTY AUTO": ["TATAMOTORS.NS", "M&M.NS", "MARUTI.NS"],
@@ -679,10 +678,6 @@ def scan_nifty_universe(symbols_tuple):
                 ema_20 = float(df['Close'].ewm(span=20, adjust=False).mean().iloc[-1])
                 sma_20 = float(df['Close'].rolling(20, min_periods=1).mean().iloc[-1])
                 rsi_val = float(calculate_rsi(df).iloc[-1])
-                
-                macd_l, macd_s, _ = calculate_macd(df, fast=12, slow=26, signal=9)
-                latest_macd = float(macd_l.iloc[-1])
-                latest_signal = float(macd_s.iloc[-1])
                 
                 vol_latest = float(df['Volume'].iloc[-1])
                 vol_sma = float(df['Volume'].rolling(20, min_periods=1).mean().iloc[-1])
@@ -731,7 +726,6 @@ def fetch_sectoral_heatmap_data():
                 curr = float(df['Close'].iloc[-1])
                 prev = float(df['Close'].iloc[-2])
                 chg = ((curr - prev) / prev) * 100
-                
                 status = "green" if chg >= 0.5 else ("red" if chg <= -0.5 else "yellow")
                 sec_results.append({"name": name, "symbol": sym, "ltp": curr, "change_pct": chg, "status": status})
             except Exception:
@@ -803,36 +797,44 @@ if st.session_state["view_mode"] == "night_outlook":
             st.session_state["view_mode"] = "dashboard"
             st.rerun()
     with b_c2:
-        st.markdown("<h3 style='margin:0; color:#38bdf8;'>🌙 Night Market Outlook & Sector-Driven AI Prediction Desk</h3>", unsafe_allow_html=True)
+        st.markdown("<h3 style='margin:0; color:#38bdf8;'>🌙 Night Market Outlook & Next-Day Prediction Desk</h3>", unsafe_allow_html=True)
         st.caption("रात्री ७ PM ते सकाळी ९ AM दरम्यान सेक्टरल हीटमॅप आणि संस्थागत प्रवाहांवर आधारित अचूक अंदाज.")
 
     st.divider()
 
-    sector_heatmap_preview = fetch_sectoral_heatmap_data()
-    top_green_sectors = [s['name'] for s in sector_heatmap_preview if s['status'] == 'green']
-    top_red_sectors = [s['name'] for s in sector_heatmap_preview if s['status'] == 'red']
-
-    sector_insight_txt = f"आजच्या सत्रात **{' , '.join(top_green_sectors[:3]) if top_green_sectors else 'इतर सेक्टर्स'}** मध्ये पॉझिटिव्ह मोमेंटम व संस्थात्मक खरेदी दिसून आली असून, यामुळे उद्याच्या सत्रात या सेक्टर्सचे शेअर्स बाजाराला दिशा देतील."
+    # 👉 निफ्टी ५० आणि बँक निफ्टीच्या परफॉर्मन्ससाठी स्वतंत्र ज्युबरदस्त बॉक्स
+    st.markdown("""
+    <div class="deal-card-blue">
+        <h3 style="margin-top:0; color:#38bdf8;">🎯 निफ्टी ५० आणि बँक निफ्टी परफॉर्मन्स तर्क व अंदाज (Nifty & Bank Nifty Deep Reasoning)</h3>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px; font-size:15px; margin-top:12px;">
+            <div style="background:rgba(0,0,0,0.2); padding:14px; border-radius:8px; border-left:4px solid #10b981;">
+                <h4 style="color:#10b981; margin-top:0;">📊 Nifty 50 Outlook</h4>
+                <p style="margin:0; line-height:1.6;">
+                    • <b>दिशा:</b> ग्लोबल मार्केट आणि FII कॅश फ्लो पॉझिटिव्ह राहिल्यास बाजार गॅप-अप किंवा पॉझिटिव्ह ओपनिंग देईल.<br>
+                    • <b>महत्त्वाचे कारण:</b> आयटी (IT) आणि ऑटो सेक्टर्समधील संस्थात्मक खरेदीमुळे निफ्टीला मजबूत सपोर्ट मिळतोय.<br>
+                    • <b>ट्रेडिंग लेव्हल:</b> २४,६५० च्या वर टिकल्यास नवीन उच्चांक संभवतो.
+                </p>
+            </div>
+            <div style="background:rgba(0,0,0,0.2); padding:14px; border-radius:8px; border-left:4px solid #38bdf8;">
+                <h4 style="color:#38bdf8; margin-top:0;">🏦 Bank Nifty Outlook</h4>
+                <p style="margin:0; line-height:1.6;">
+                    • <b>दिशा:</b> लार्जकॅप बँकांचे (HDFC, ICICI) व्हॉल्यूम संकेत बुलिश आहेत.<br>
+                    • <b>महत्त्वाचे कारण:</b> DII कडून नियमित खरेदी सुरू असल्याने डिप्सवर (Dips) जोरदार बायिंग येत आहे.<br>
+                    • <b>ट्रेडिंग लेव्हल:</b> ५१,५०० हा कळीचा सपोर्ट झोन म्हणून काम करेल.
+                </p>
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
     no_col1, no_col2 = st.columns(2)
     with no_col1:
-        st.markdown(f"""
-        <div class="deal-card-blue">
-            <h4 style="margin-top:0; color:#38bdf8;">📊 सेक्टरल निष्कर्ष व इंडेक्स मूड (Sectoral Flow Mood)</h4>
-            <p style="font-size:15px; line-height:1.7;">
-                {sector_insight_txt}<br>
-                • <b>क्रूड ऑइल (Crude) & कमॉडिटी:</b> एनर्जी सेक्टर्सच्या किमतींवर आधारित उद्याचा ट्रेंड स्थिर ते पॉझिटिव्ह राहण्याची शक्यता.<br>
-                • <b>बँक निफ्टी आउटलुक:</b> प्रायव्हेट बँकांचे व्हॉल्यूम स्ट्रॉंग असल्याने ओपनिंगपासूनच बायर्स एक्टिव्ह राहतील.
-            </p>
-        </div>
-        """, unsafe_allow_html=True)
-
         st.markdown("""
         <div class="deal-card-green">
-            <h4 style="margin-top:0; color:#10b981;">🥇 सोने (Gold) व ऊर्जा (Crude) विश्लेषण</h4>
+            <h4 style="margin-top:0; color:#10b981;">🥇 सोने (Gold) व क्रूड ऑइल (Crude Oil) ट्रेंड</h4>
             <p style="font-size:15px; line-height:1.7;">
-                • ग्लोबल कमॉडिटी मार्केटमधील क्रूड ऑइलच्या हालचालींमुळे पेंट आणि टायर कंपन्यांच्या मार्जिनवर सकारात्मक परिणाम होईल.<br>
-                • सुरक्षित गुंतवणुकीसाठी सोन्याच्या भावात रात्रीच्या सत्रात स्थिरता दिसून येत आहे.
+                • <b>क्रूड ऑइल (Crude):</b> किमतींमध्ये स्थिरता असल्याने उत्पादक कंपन्यांचे (Paints, Tyres) मार्जिन वाढण्यास मदत होईल.<br>
+                • <b>सोने (Gold):</b> सुरक्षित गुंतवणुकीसाठी (Safe Haven) सोन्यात रात्रीच्या सत्रात खरेदीचा ओघ कायम आहे.
             </p>
         </div>
         """, unsafe_allow_html=True)
@@ -842,20 +844,9 @@ if st.session_state["view_mode"] == "night_outlook":
         <div class="deal-card-gold">
             <h4 style="margin-top:0; color:#eab308;">🚀 उद्यासाठी सर्वोत्तम परफॉर्मन्स देणारे स्टॉक्स (Top Momentum Picks)</h4>
             <p style="font-size:15px; line-height:1.7;">
-                १. <b>Trent Ltd (TRENT.NS):</b> मजबूत तिमाही निकाल व सेक्टरल सपोर्ट.<br>
-                २. <b>Mazagon Dock (MAZDOCK.NS):</b> डिफेन्स ऑर्डर बुक्समुळे हाय-डिमांड झोनमध्ये.<br>
-                ३. <b>Tata Power (TATAPOWER.NS):</b> पॉवर व एनर्जी सेक्टरमधील तेजीचा लाभ.
-            </p>
-        </div>
-        """, unsafe_allow_html=True)
-
-        st.markdown("""
-        <div class="deal-card-blue">
-            <h4 style="margin-top:0; color:#38bdf8;">🛡️ रिस्क मॅनेजमेंट आणि ट्रेडिंग धोरण</h4>
-            <p style="font-size:15px; line-height:1.7;">
-                • सकाळी ९:१५ ते ९:३० मधील पहिली रेंज (ORB) ब्रेकआउट पाहा.<br>
-                • सेक्टरल ट्रेंडच्या अनुकूल असणाऱ्या स्टॉक्समध्येच ट्रेड घ्या.<br>
-                • शिस्तीचे पालन करून ATR स्टॉपलॉस वापरा.
+                १. <b>Trent Ltd (TRENT.NS):</b> स्ट्रॉंग मोमेंटम आणि पॉझिटिव्ह ब्रेकआउट.<br>
+                २. <b>Mazagon Dock (MAZDOCK.NS):</b> डिफेन्स ऑर्डर्समुळे मजबूत डिमांड.<br>
+                ३. <b>Tata Power (TATAPOWER.NS):</b> पॉवर सेक्टरच्या तेजीचा थेट फायदा.
             </p>
         </div>
         """, unsafe_allow_html=True)
