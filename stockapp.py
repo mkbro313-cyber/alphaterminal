@@ -51,7 +51,7 @@ st.set_page_config(
     initial_sidebar_state="auto"
 )
 
-# भाषा डिक्शनरी (Language Dictionary for Translation)
+# सर्वसमावेशक भाषाकोश (Comprehensive Translation Dictionary)
 LANG_DICT = {
     "मराठी": {
         "title": "⚡ अल्फा टर्मिनल प्रो",
@@ -66,7 +66,23 @@ LANG_DICT = {
         "risk_label": "🛡️ कमाल रिस्क %:",
         "back_btn": "🔙 डॅशबोर्डवर परत जा",
         "chart_desk_btn": "📈 प्रोफेसनल ट्रेडिंग चार्ट डेस्क ⚡",
-        "sector_desk_btn": "🏢 सेक्टरल हीटमॅप डेस्क ⚡"
+        "sector_desk_btn": "🏢 सेक्टरल हीटमॅप डेस्क ⚡",
+        "tab1": "🎯 रिस्क मॅनेजमेंट व पोझिशन सायझर",
+        "tab2": "🏢 फंडामेंटल व स्मार्ट मनी",
+        "tab3": "⚡ सपोर्ट, रेझिस्टन्स व व्हॅल्युएशन",
+        "tab4": "📰 कंपनी बिझनेस व लाइव्ह न्यूज",
+        "ltp_lbl": "सध्याचा भाव (LTP)",
+        "mcap_lbl": "मार्केट कॅप",
+        "rsi_lbl": "RSI (14)",
+        "high_lbl": "५२-आठवडे High",
+        "strengths": "✅ सकारात्मक निकष (Strengths):",
+        "weaknesses": "⚠️ नकारात्मक / जोखीम निकष (Weaknesses):",
+        "ownership": "🏛️ स्मार्ट मनी शेअरहोल्डिंग (Ownership Breakdown)",
+        "growth": "📈 वाढ आणि नफा क्षमता",
+        "levels": "🧭 महत्त्वाचे सपोर्ट व रेझिस्टन्स लेव्हल्स",
+        "valuation": "💎 व्हॅल्युएशन मेट्रिक्स (Valuation)",
+        "business": "🏭 कंपनी नेमके काय काम करते? (Business Operations)",
+        "news": "📰 या शेअरबद्दलच्या ताज्या अधिकृत थेट बातम्या (Live Authentic News):"
     },
     "हिंदी": {
         "title": "⚡ अल्फा टर्मिनल प्रो",
@@ -81,7 +97,23 @@ LANG_DICT = {
         "risk_label": "🛡️ अधिकतम रिस्क %:",
         "back_btn": "🔙 डैशबोर्ड पर वापस जाएं",
         "chart_desk_btn": "📈 प्रोफेशनल ट्रेडिंग चार्ट डेस्क ⚡",
-        "sector_desk_btn": "🏢 सेक्टरल हीटमैप डेस्क ⚡"
+        "sector_desk_btn": "🏢 सेक्टरल हीटमैप डेस्क ⚡",
+        "tab1": "🎯 रिस्क मैनेजमेंट व पोजीशन साइज़र",
+        "tab2": "🏢 फंडामेंटल व स्मार्ट मनी",
+        "tab3": "⚡ सपोर्ट, रेजिस्टेंस व वैल्युएशन",
+        "tab4": "📰 कंपनी बिजनेस व लाइव न्यूज़",
+        "ltp_lbl": "करेंट प्राइस (LTP)",
+        "mcap_lbl": "मार्केट कैप",
+        "rsi_lbl": "RSI (14)",
+        "high_lbl": "52-वीक High",
+        "strengths": "✅ सकारात्मक बिंदु (Strengths):",
+        "weaknesses": "⚠️ नकारात्मक / जोखिम बिंदु (Weaknesses):",
+        "ownership": "🏛️ स्मार्ट मनी शेयरहोल्डिंग (Ownership Breakdown)",
+        "growth": "📈 ग्रोथ और प्रॉफिट क्षमता",
+        "levels": "🧭 महत्वपूर्ण सपोर्ट व रेजिस्टेंस लेवल्स",
+        "valuation": "💎 वैल्युएशन मेट्रिक्स (Valuation)",
+        "business": "🏭 कंपनी का मुख्य बिजनेस क्या है?",
+        "news": "📰 इस शेयर से जुड़ी ताज़ा खबरें (Live Authentic News):"
     },
     "English": {
         "title": "⚡ ALPHA TERMINAL PRO",
@@ -96,7 +128,23 @@ LANG_DICT = {
         "risk_label": "🛡️ Max Risk %:",
         "back_btn": "🔙 Back to Terminal Dashboard",
         "chart_desk_btn": "📈 Open Professional Trading Chart Desk ⚡",
-        "sector_desk_btn": "🏢 Sectoral Heatmap Desk ⚡"
+        "sector_desk_btn": "🏢 Sectoral Heatmap Desk ⚡",
+        "tab1": "🎯 Risk Management & Position Sizer",
+        "tab2": "🏢 Fundamentals & Smart Money",
+        "tab3": "⚡ Support, Resistance & Valuation",
+        "tab4": "📰 Company Business & Live News",
+        "ltp_lbl": "Live Price (LTP)",
+        "mcap_lbl": "Market Cap",
+        "rsi_lbl": "RSI (14)",
+        "high_lbl": "52W High",
+        "strengths": "✅ Key Strengths:",
+        "weaknesses": "⚠️ Key Risks / Weaknesses:",
+        "ownership": "🏛️ Smart Money Shareholding (Ownership Breakdown)",
+        "growth": "📈 Growth & Profitability",
+        "levels": "🧭 Critical Support & Resistance Levels",
+        "valuation": "💎 Valuation Metrics",
+        "business": "🏭 Company Business Operations",
+        "news": "📰 Latest Authentic Live News:"
     }
 }
 
@@ -1614,7 +1662,7 @@ if st.session_state.get('data_ready', False):
     elif st.session_state["view_mode"] == "sector_desk":
         b_c1, b_c2 = st.columns([1.5, 4.5])
         with b_c1:
-            if st.button("🔙 Back to Chart Desk", use_container_width=True):
+            if st.button(lang["back_btn"], use_container_width=True):
                 st.session_state["view_mode"] = "chart_desk"
                 st.rerun()
         with b_c2:
@@ -2153,10 +2201,10 @@ if st.session_state.get('data_ready', False):
                 st.write("**सल्ला:** डाऊनट्रेंड किंवा फंडामेंटल धोक्यामुळे या शेअरमध्ये नवी एन्ट्री टाळावी.")
 
             m1, m2, m3, m4 = st.columns(4)
-            m1.metric("सध्याचा भाव (LTP)", f"₹{curr_price:.2f}", f"{price_change_pct:.2f}%")
-            m2.metric("मार्केट कॅप", f"₹{market_cap_cr:,.0f} Cr" if market_cap_cr > 0 else "N/A")
-            m3.metric("RSI (14)", f"{latest_rsi:.1f}")
-            m4.metric("५२-आठवडे High", f"₹{high_52w:.2f}", f"-{pct_from_52w_high:.1f}%")
+            m1.metric(lang["ltp_lbl"], f"₹{curr_price:.2f}", f"{price_change_pct:.2f}%")
+            m2.metric(lang["mcap_lbl"], f"₹{market_cap_cr:,.0f} Cr" if market_cap_cr > 0 else "N/A")
+            m3.metric(lang["rsi_lbl"], f"{latest_rsi:.1f}")
+            m4.metric(lang["high_lbl"], f"₹{high_52w:.2f}", f"-{pct_from_52w_high:.1f}%")
 
         st.divider()
         c_btn_c1, c_btn_c2, c_btn_c3 = st.columns([1, 2.5, 1])
@@ -2166,10 +2214,10 @@ if st.session_state.get('data_ready', False):
                 st.rerun()
 
         f_tab1, f_tab2, f_tab3, f_tab4 = st.tabs([
-            "🎯 रिस्क मॅनेजमेंट व पोझिशन सायझर", 
-            "🏢 फंडामेंटल व स्मार्ट मनी", 
-            "⚡ सपोर्ट, रेझिस्टन्स व व्हॅल्युएशन",
-            "📰 कंपनी बिझनेस व लाइव्ह न्यूज"
+            lang["tab1"], 
+            lang["tab2"], 
+            lang["tab3"],
+            lang["tab4"]
         ])
 
         with f_tab1:
@@ -2196,7 +2244,7 @@ if st.session_state.get('data_ready', False):
         with f_tab2:
             f_col1, f_col2 = st.columns([1.2, 1])
             with f_col1:
-                st.markdown("#### 🏛️ स्मार्ट मनी शेअरहोल्डिंग (Ownership Breakdown)")
+                st.markdown(f"#### {lang['ownership']}")
                 st.markdown(f"""
                 - **प्रमोटर हिस्सेदारी:** <b style="font-size:18px;">{display_promoter:.1f}%</b><br>
                 - **FII / DII संस्थात्मक हिस्सेदारी:** <b style="font-size:18px;">{display_fii:.1f}%</b><br>
@@ -2219,7 +2267,7 @@ if st.session_state.get('data_ready', False):
                 st.plotly_chart(pie_fig, use_container_width=True)
 
             with f_col2:
-                st.markdown("#### 📈 वाढ आणि नफा क्षमता")
+                st.markdown(f"#### {lang['growth']}")
                 st.markdown(f"""
                 - **३ वर्षे वार्षिक परतावा (CAGR):** <b style="font-size:18px;">{f'{return_3y:.1f}%' if return_3y is not None else 'N/A'}</b><br>
                 - **५ वर्षे वार्षिक परतावा (CAGR):** <b style="font-size:18px;">{f'{return_5y:.1f}%' if return_5y is not None else 'N/A'}</b><br>
@@ -2230,7 +2278,7 @@ if st.session_state.get('data_ready', False):
         with f_tab3:
             sr_col1, sr_col2 = st.columns(2)
             with sr_col1:
-                st.markdown("#### 🧭 महत्त्वाचे सपोर्ट व रेझिस्टन्स लेव्हल्स")
+                st.markdown(f"#### {lang['levels']}")
                 st.markdown(f"""
                 - **रेझिस्टन्स (R1):** <b style="font-size:18px; color:#ef4444;">₹{r1_val:.2f}</b><br>
                 - **महत्त्वाचा पिव्हॉट पॉईंट (Pivot):** <b style="font-size:18px; color:#eab308;">₹{pivot:.2f}</b><br>
@@ -2239,22 +2287,22 @@ if st.session_state.get('data_ready', False):
                 """, unsafe_allow_html=True)
 
             with sr_col2:
-                st.markdown("#### 💎 व्हॅल्युएशन मेट्रिक्स (Valuation)")
+                st.markdown(f"#### {lang['valuation']}")
                 pe_val = info.get('trailingPE') if isinstance(info, dict) else None
                 pb_val = info.get('priceToBook') if isinstance(info, dict) else None
                 div_val = info.get('dividendYield') if isinstance(info, dict) else None
                 
                 st.markdown(f"""
                 - **P/E Ratio:** <b style="font-size:18px;">{f'{pe_val:.2f}' if pe_val else 'N/A'}</b><br>
-                - **Price to Book (P/B):</b> <b style="font-size:18px;">{f'{pb_val:.2f}' if pb_val else 'N/A'}</b><br>
+                - **Price to Book (P/B):** <b style="font-size:18px;">{f'{pb_val:.2f}' if pb_val else 'N/A'}</b><br>
                 - **डिव्हिडंड यील्ड (Yield):** <b style="font-size:18px;">{f'{div_val*100:.2f}%' if div_val else '0.0%'}</b>
                 """, unsafe_allow_html=True)
 
         with f_tab4:
-            st.markdown("#### 🏭 कंपनी नेमके काय काम करते? (Business Operations)")
+            st.markdown(f"#### {lang['business']}")
             st.write(business_summary if len(business_summary) < 600 else business_summary[:600] + "...")
 
-            st.markdown("#### 📰 या शेअरबद्दलच्या ताज्या अधिकृत थेट बातम्या (Live Authentic News):")
+            st.markdown(f"#### {lang['news']}")
             if stock_news and len(stock_news) > 0:
                 for n_idx, item in enumerate(stock_news):
                     title = item.get('title', '')
@@ -2278,11 +2326,11 @@ if st.session_state.get('data_ready', False):
         st.divider()
         col_l, col_r = st.columns(2)
         with col_l:
-            st.markdown("#### ✅ सकारात्मक निकष (Strengths):")
+            st.markdown(f"#### {lang['strengths']}")
             for item in reasons_green:
                 st.write(f"- {item}")
 
         with col_r:
-            st.markdown("#### ⚠️ नकारात्मक / जोखीम निकष (Weaknesses):")
+            st.markdown(f"#### {lang['weaknesses']}")
             for item in reasons_red:
                 st.write(f"- {item}")
