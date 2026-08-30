@@ -59,7 +59,7 @@ LANG_DICT = {
         "outlook_btn": "🌙 AI नाईट मार्केट प्रेडिक्शन (AI Night Outlook)",
         "select_univ": "📊 इंडेक्स युनिव्हर्स निवडा:",
         "select_smart": "🌟 स्मार्ट फंडामेंटल & डील युनिव्हर्स निवडा:",
-        "filter_label": "🎯 अचूक ट्रेडिंग फिल्टर निवडा:",
+        "filter_label": "🎯 अचूक व्हॉल्यूम व पुलबॅक फिल्टर निवडा:",
         "search_label": "🔍 NSE टिकर सर्च / सिलेक्ट करा:",
         "capital_label": "💼 भांडवल (₹):",
         "risk_label": "🛡️ कमाल रिस्क %:",
@@ -91,7 +91,7 @@ LANG_DICT = {
         "outlook_btn": "🌙 AI नाईट मार्केट प्रेडिक्शन (AI Night Outlook)",
         "select_univ": "📊 इंडेक्स यूनिवर्स चुनें:",
         "select_smart": "🌟 स्मार्ट फंडामेंटल & डील यूनिवर्स चुनें:",
-        "filter_label": "🎯 सटीक ट्रेडिंग फ़िल्टर चुनें:",
+        "filter_label": "🎯 सटीक वॉल्यूम व पुलबैक फ़िल्टर चुनें:",
         "search_label": "🔍 NSE टिकर सर्च / सेलेक्ट करें:",
         "capital_label": "💼 कैपिटल (₹):",
         "risk_label": "🛡️ अधिकतम रिस्क %:",
@@ -123,7 +123,7 @@ LANG_DICT = {
         "outlook_btn": "🌙 AI Night Market Outlook",
         "select_univ": "📊 Select Index Universe:",
         "select_smart": "🌟 Select Smart Fundamental & Deal Universe:",
-        "filter_label": "🎯 Select Precision Filter:",
+        "filter_label": "🎯 Select Volume & Pullback Filter:",
         "search_label": "🔍 Search / Select NSE Ticker:",
         "capital_label": "💼 Capital (₹):",
         "risk_label": "🛡️ Max Risk %:",
@@ -419,18 +419,7 @@ def add_indicators(df):
     clean = clean[~clean.index.duplicated(keep='last')].sort_index()
     clean['EMA_200'] = clean['Close'].ewm(span=200, adjust=False).mean()
     clean['EMA_50'] = clean['Close'].ewm(span=50, adjust=False).mean()
-    clean['EMA_15'] = clean['Close'].ewm(span=15, adjust=False).mean()
-    clean['EMA_9'] = clean['Close'].ewm(span=9, adjust=False).mean()
     clean['EMA_20'] = clean['Close'].ewm(span=20, adjust=False).mean()
-    
-    # VWAP Calculation
-    if 'Volume' in clean.columns and 'Close' in clean.columns and 'High' in clean.columns and 'Low' in clean.columns:
-        typical_price = (clean['High'] + clean['Low'] + clean['Close']) / 3.0
-        clean['VWAP'] = (typical_price * clean['Volume']).cumsum() / clean['Volume'].cumsum().replace(0, np.nan)
-        clean['VWAP'] = clean['VWAP'].ffill().bfill().fillna(clean['Close'])
-    else:
-        clean['VWAP'] = clean['Close']
-
     clean['SMA_20'] = clean['Close'].rolling(window=20, min_periods=1).mean().ffill().bfill()
     if 'Volume' in clean.columns:
         clean['Vol_20_SMA'] = clean['Volume'].rolling(window=20, min_periods=1).mean().ffill().bfill()
@@ -690,7 +679,7 @@ def scan_nifty_universe(symbols_tuple):
                 ema_9 = float(df['Close'].ewm(span=9, adjust=False).mean().iloc[-1])
                 ema_15 = float(df['Close'].ewm(span=15, adjust=False).mean().iloc[-1])
                 ema_200 = float(df['Close'].ewm(span=200, adjust=False).mean().iloc[-1])
-                vwap_val = float(df['Close'].iloc[-1]) # Proxy for daily vwap alignment
+                vwap_val = curr # Live VWAP proxy
                 
                 rsi_val = float(calculate_rsi(df).iloc[-1])
                 
@@ -701,11 +690,11 @@ def scan_nifty_universe(symbols_tuple):
                 high_52 = float(df['High'].max())
                 pct_from_high = ((high_52 - curr) / high_52) * 100 if high_52 > 0 else 0.0
 
-                # 🎯 इंट्राडे ORB + VWAP + 9/15 EMA क्रॉसओव्हर लॉजिक
+                # 🎯 इंट्राडे ORB + VWAP + 9/15 EMA क्रॉसओवर आणि पुलबॅक लॉजिक
                 is_above_vwap = (curr >= vwap_val * 0.99)
                 ema_crossover = (ema_9 > ema_15)
                 is_green_candle = (float(df['Close'].iloc[-1]) > float(df['Open'].iloc[-1]))
-                near_9ema = (abs(curr - ema_9) / ema_9 <= 0.015)
+                near_9ema = (abs(curr - ema_9) / ema_9 <= 0.02)
 
                 is_intraday_orb_setup = bool(is_above_vwap and ema_crossover and is_green_candle and near_9ema)
 
@@ -720,13 +709,11 @@ def scan_nifty_universe(symbols_tuple):
                     "PctFromHigh": pct_from_high,
                     "RSI_Val": rsi_val,
                     "is_intraday_orb_setup": is_intraday_orb_setup,
-                    "is_multi_tf_breakout": bool(curr > ema_200 and vol_ratio >= 1.25),
                     "is_super_bullish": bool(ema_crossover and rsi_val >= 50),
                     "is_vol_breakout": bool(vol_ratio >= 1.20 and chg_pct > 0),
                     "is_near_52w": bool(pct_from_high <= 8.0),
                     "is_support_buy": bool(rsi_val <= 42),
-                    "is_institutional_heavy": bool(vol_ratio >= 1.30 and chg_pct > 0.1),
-                    "is_custom_super_breakout": bool(curr > ema_200 and vol_ratio >= 1.15 and 52 <= rsi_val <= 75)
+                    "is_institutional_heavy": bool(vol_ratio >= 1.30 and chg_pct > 0.1)
                 })
             except Exception:
                 continue
@@ -887,7 +874,7 @@ elif st.session_state["view_mode"] == "dashboard":
             "🔄 वॉचलिस्ट मोड निवडा:",
             ["Nifty Indices (डिफॉल्ट)", "Smart Watchlists (FII/DII/निकाल)"],
             index=1 if st.session_state["smart_watchlist_toggle"] else 0,
-            key="watchlist_selectbox_mode_intraday"
+            key="watchlist_selectbox_mode_intraday_final"
         )
         st.session_state["smart_watchlist_toggle"] = (sw_choice == "Smart Watchlists (FII/DII/निकाल)")
 
@@ -940,7 +927,7 @@ elif st.session_state["view_mode"] == "dashboard":
                 selected_pool = tuple([f"{s}.NS" for s in HIGH_ORDERS_POOL])
 
     with sc_col2:
-        # 🎯 केवळ अत्यंत महत्त्वाचे आणि इंट्राडे ORB + VWAP + 9/15 EMA फिल्टरसह मोजके फिल्टर्स
+        # 🎯 इंट्राडे ORB + VWAP + 9/15 EMA लॉजिक फिल्टर समाविष्ट
         filter_options = [
             "सर्व शेअर्स (All)", 
             "🎯 इंट्राडे ORB + VWAP + 9/15 EMA सेटअप",
