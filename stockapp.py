@@ -854,7 +854,7 @@ elif st.session_state["view_mode"] == "dashboard":
         use_smart_lists = st.checkbox(
             "🔄 वॉचलिस्ट स्विचर (OFF = Nifty Indices | ON = Smart Watchlists)",
             value=st.session_state["smart_watchlist_toggle"],
-            key="toggle_smart_watchlist_ui_mobile"
+            key="toggle_smart_watchlist_ui_mobile_v2"
         )
         st.session_state["smart_watchlist_toggle"] = use_smart_lists
 
@@ -1922,17 +1922,17 @@ if st.session_state.get('data_ready', False):
                 enable_sd_mode = st.checkbox(
                     "🏛️ Smart Money (SMC) Demand & Supply Mode",
                     value=True,
-                    key="sd_desk_toggle_mobile"
+                    key="sd_desk_toggle_mobile_v2"
                 )
                 chart_custom_height = st.slider("📏 चार्टची उंची (Chart Height):", min_value=450, max_value=950, value=650, step=50)
             with sd_col3:
-                is_dark_theme = st.checkbox("🌙 Dark Mode Chart", value=True, key="toggle_chart_theme_key_mobile")
+                is_dark_theme = st.checkbox("🌙 Dark Mode Chart", value=True, key="toggle_chart_theme_key_mobile_v2")
 
             ind_col1, ind_col2 = st.columns(2)
             with ind_col1:
-                enable_rsi = st.checkbox("📊 RSI Indicator (14)", value=False, key="toggle_rsi_key_mobile")
+                enable_rsi = st.checkbox("📊 RSI Indicator (14)", value=False, key="toggle_rsi_key_mobile_v2")
             with ind_col2:
-                enable_macd = st.checkbox("⚡ MACD Indicator", value=False, key="toggle_macd_key_mobile")
+                enable_macd = st.checkbox("⚡ MACD Indicator", value=False, key="toggle_macd_key_mobile_v2")
 
             if chart_type == "W":
                 c_data = weekly_hist.copy()
