@@ -43,7 +43,6 @@ def get_upstox_ltp(symbol_input):
         pass
     return None
 
-# १. पेज कॉन्फिगरेशन
 st.set_page_config(
     page_title="ALPHA TERMINAL PRO ⚡",
     page_icon="⚡",
@@ -60,7 +59,7 @@ LANG_DICT = {
         "outlook_btn": "🌙 AI नाईट मार्केट प्रेडिक्शन (AI Night Outlook)",
         "select_univ": "📊 इंडेक्स युनिव्हर्स निवडा:",
         "select_smart": "🌟 स्मार्ट फंडामेंटल & डील युनिव्हर्स निवडा:",
-        "filter_label": "🎯 क्रायटेरियानुसार फिल्टर करा:",
+        "filter_label": "🎯 अचूक ट्रेडिंग फिल्टर निवडा:",
         "search_label": "🔍 NSE टिकर सर्च / सिलेक्ट करा:",
         "capital_label": "💼 भांडवल (₹):",
         "risk_label": "🛡️ कमाल रिस्क %:",
@@ -92,7 +91,7 @@ LANG_DICT = {
         "outlook_btn": "🌙 AI नाईट मार्केट प्रेडिक्शन (AI Night Outlook)",
         "select_univ": "📊 इंडेक्स यूनिवर्स चुनें:",
         "select_smart": "🌟 स्मार्ट फंडामेंटल & डील यूनिवर्स चुनें:",
-        "filter_label": "🎯 क्राइटेरिया के अनुसार फ़िल्टर करें:",
+        "filter_label": "🎯 सटीक ट्रेडिंग फ़िल्टर चुनें:",
         "search_label": "🔍 NSE टिकर सर्च / सेलेक्ट करें:",
         "capital_label": "💼 कैपिटल (₹):",
         "risk_label": "🛡️ अधिकतम रिस्क %:",
@@ -124,7 +123,7 @@ LANG_DICT = {
         "outlook_btn": "🌙 AI Night Market Outlook",
         "select_univ": "📊 Select Index Universe:",
         "select_smart": "🌟 Select Smart Fundamental & Deal Universe:",
-        "filter_label": "🎯 Filter by Criteria:",
+        "filter_label": "🎯 Select Precision Filter:",
         "search_label": "🔍 Search / Select NSE Ticker:",
         "capital_label": "💼 Capital (₹):",
         "risk_label": "🛡️ Max Risk %:",
@@ -547,9 +546,7 @@ def detect_advanced_sd_zones(df):
 
     return list(reversed(final_demand)), list(reversed(final_supply))
 
-# 🌟 NIFTY 50, 100, 500, MIDCAP 100 & SMALLCAP 100 FULL UNIVERSE
 NIFTY_RAW_LIST = [
-    # Nifty 50 & 100
     "RELIANCE", "TCS", "HDFCBANK", "BHARTIARTL", "ICICIBANK", "INFY", "SBIN", "LICI", "ITC", "HINDUNILVR",
     "LT", "BAJFINANCE", "HCLTECH", "M&M", "SUNPHARMA", "MARUTI", "ONGC", "KOTAKBANK", "NTPC", "AXISBANK",
     "TATAMOTORS", "POWERGRID", "ADANIENT", "ADANIPORTS", "COALINDIA", "TRENT", "BAJAJFINSV", "TITAN", "ULTRACEMCO", "WIPRO",
@@ -560,8 +557,6 @@ NIFTY_RAW_LIST = [
     "PIDILITIND", "POLYCAB", "CANBK", "PNB", "MAXHEALTH", "BANKBARODA", "JSWENERGY", "CUMMINSIND", "MOTHERSON", "UNIONBANK",
     "JINDALSTEL", "GODREJCP", "SUZLON", "BOSCHLTD", "TORNTPOWER", "PERSISTENT", "IOB", "CGPOWER", "BHEL", "LUPIN",
     "OFSS", "DIXON", "TORNTPHARM", "AUROPHARMA", "COLPAL", "PRESTIGE", "MARICO", "SOLARINDS", "INDIANB", "BERGEPAINT",
-    
-    # Nifty Midcap 100 & Smallcap 100
     "OBEROIRLTY", "COROMANDEL", "KALYANKJIL", "MUTHOOTFIN", "GICRE", "PHOENIXLTD", "ABCAPITAL", "MAHABANK", "FEDERALBNK", "NHPC",
     "ALKEM", "FACT", "ASTRAL", "PIIND", "UBL", "YESBANK", "ASHOKLEY", "BALKRISIND", "ESCORTS", "PATANJALI",
     "PETRONET", "GMRINFRA", "UNOMINDA", "APOLLOTYRE", "BHARATFORG", "IRCTC", "SUNDARMFIN", "DALBHARAT", "MFSL", "UCOBANK",
@@ -670,7 +665,7 @@ def scan_nifty_universe(symbols_tuple):
         for ticker in symbols_list:
             try:
                 df = data[ticker].dropna() if ticker in data else pd.DataFrame()
-                if df.empty or len(df) < 50:
+                if df.empty or len(df) < 200:
                     continue
                 
                 curr = float(df['Close'].iloc[-1])
@@ -679,14 +674,11 @@ def scan_nifty_universe(symbols_tuple):
                     curr = upstox_live
 
                 prev = float(df['Close'].iloc[-2]) if len(df) >= 2 else curr
-                prev_high = float(df['High'].iloc[-2]) if len(df) >= 2 else curr
-                open_today = float(df['Open'].iloc[-1])
                 chg_pct = ((curr - prev) / prev) * 100
                 
                 ema_200 = float(df['Close'].ewm(span=200, adjust=False).mean().iloc[-1])
                 ema_50 = float(df['Close'].ewm(span=50, adjust=False).mean().iloc[-1])
                 ema_20 = float(df['Close'].ewm(span=20, adjust=False).mean().iloc[-1])
-                sma_20 = float(df['Close'].rolling(20, min_periods=1).mean().iloc[-1])
                 rsi_val = float(calculate_rsi(df).iloc[-1])
                 
                 vol_latest = float(df['Volume'].iloc[-1])
@@ -695,6 +687,14 @@ def scan_nifty_universe(symbols_tuple):
                 
                 high_52 = float(df['High'].max())
                 pct_from_high = ((high_52 - curr) / high_52) * 100 if high_52 > 0 else 0.0
+
+                # 🎯 नवीन पुलबॅक बाय आणि 9/15 EMA क्रॉसओव्हर लॉजिक
+                is_above_200 = (curr > ema_200)
+                near_pullback = (abs(curr - ema_20) / ema_20 <= 0.02) or (abs(curr - ema_50) / ema_50 <= 0.02)
+                rsi_healthy = (50.0 <= rsi_val <= 60.0)
+                vol_strong = (vol_ratio >= 1.1)
+
+                is_pullback_setup = bool(is_above_200 and near_pullback and rsi_healthy and vol_strong)
 
                 results.append({
                     "Ticker": ticker,
@@ -706,9 +706,10 @@ def scan_nifty_universe(symbols_tuple):
                     "VolRatio": vol_ratio,
                     "PctFromHigh": pct_from_high,
                     "RSI_Val": rsi_val,
+                    "is_pullback_setup": is_pullback_setup,
                     "is_multi_tf_breakout": bool(curr > ema_200 and curr > ema_50 and vol_ratio >= 1.25),
                     "is_super_bullish": bool(curr > ema_20 and curr > ema_50 and rsi_val >= 50),
-                    "is_vol_breakout": bool(vol_ratio >= 1.20 and curr >= sma_20 and chg_pct > 0),
+                    "is_vol_breakout": bool(vol_ratio >= 1.20 and curr >= ema_200 * 0.95 and chg_pct > 0),
                     "is_near_52w": bool(pct_from_high <= 8.0),
                     "is_support_buy": bool(rsi_val <= 42 or (curr <= ema_200 * 1.02 and curr >= ema_200 * 0.98)),
                     "is_institutional_heavy": bool(vol_ratio >= 1.30 and curr > ema_20 and chg_pct > 0.1),
@@ -812,7 +813,6 @@ if st.session_state["view_mode"] == "night_outlook":
 
     st.divider()
 
-    # 🔬 Next-Level Scientific AI Market Prediction Boxes
     st.markdown("""
     <div class="deal-card-blue">
         <h3 style="margin-top:0; color:#38bdf8;">🌐 १. ग्लोबल मार्केट कोरिलेशन व गिफ्ट निफ्टी (Global Market & Gift Nifty Sentiment)</h3>
@@ -927,10 +927,10 @@ elif st.session_state["view_mode"] == "dashboard":
                 selected_pool = tuple([f"{s}.NS" for s in HIGH_ORDERS_POOL])
 
     with sc_col2:
+        # 🎯 सुव्यवस्थित आणि मोजके प्रगत फिल्टर्स (अनावश्यक फिल्टर काढून टाकले)
         filter_options = [
             "सर्व शेअर्स (All)", 
-            "🔥 मल्टी-टाइमफ्रेम व्हॉल्यूम ब्रेकआउट (1Y/6M/3M/1M/W)",
-            "🚀 सुपर ब्रेकआउट + स्ट्रॉंग फंडामेंटल्स (Chartink Pro)",
+            "🎯 पुलबॅक बाय सेटअप (200EMA + 20/50 EMA Pullback + RSI 50-60)",
             "🏛️ FII/DII संस्थात्मक मोठी खरेदी (Heavy Buying)",
             "🟢 सुपर बुलिश ब्रेकआउट", 
             "⚡ व्हॉल्यूम ब्रेकआउट (> 20 SMA)", 
@@ -948,12 +948,9 @@ elif st.session_state["view_mode"] == "dashboard":
         screener_data = scan_nifty_universe(selected_pool)
 
     if not screener_data.empty:
-        if "मल्टी-टाइमफ्रेम" in flt_choice or "1Y/6M" in flt_choice:
-            filtered_rows = screener_data[screener_data['is_multi_tf_breakout']].sort_values(by="VolRatio", ascending=False)
-            tag_label = "🔥 Multi-TF Breakout"
-        elif "Chartink Pro" in flt_choice or "सुपर ब्रेकआउट" in flt_choice:
-            filtered_rows = screener_data[screener_data['is_custom_super_breakout']].sort_values(by="VolRatio", ascending=False)
-            tag_label = "🚀 Super Breakout"
+        if "पुलबॅक बाय सेटअप" in flt_choice or "Pullback" in flt_choice:
+            filtered_rows = screener_data[screener_data['is_pullback_setup']].sort_values(by="VolRatio", ascending=False)
+            tag_label = "🎯 Pullback Buy"
         elif "FII/DII" in flt_choice or "संस्थात्मक" in flt_choice:
             filtered_rows = screener_data[screener_data['is_institutional_heavy']].sort_values(by="VolRatio", ascending=False)
             tag_label = "🏛️ Big Inst. Buy"
