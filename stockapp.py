@@ -851,12 +851,14 @@ if st.session_state["view_mode"] == "night_outlook":
 elif st.session_state["view_mode"] == "dashboard":
     sc_mode_col1, sc_mode_col2 = st.columns([1.5, 1.5])
     with sc_mode_col1:
-        use_smart_lists = st.checkbox(
-            "🔄 वॉचलिस्ट स्विचर (OFF = Nifty Indices | ON = Smart Watchlists)",
-            value=st.session_state["smart_watchlist_toggle"],
-            key="toggle_smart_watchlist_ui_mobile_v2"
+        # మొబైల్ టచ్ ఫ్రెండ్లీ st.selectbox (इंडेक्स vs स्मार्ट वॉचलिस्ट)
+        sw_choice = st.selectbox(
+            "🔄 वॉचलिस्ट मोड निवडा:",
+            ["Nifty Indices (डिफॉल्ट)", "Smart Watchlists (FII/DII/निकाल)"],
+            index=1 if st.session_state["smart_watchlist_toggle"] else 0,
+            key="watchlist_selectbox_mode"
         )
-        st.session_state["smart_watchlist_toggle"] = use_smart_lists
+        st.session_state["smart_watchlist_toggle"] = (sw_choice == "Smart Watchlists (FII/DII/निकाल)")
 
     with sc_mode_col2:
         st.caption("💡 टीप: Smart Watchlists द्वारे FII/DII, निकाल व ऑर्डर्सचे शेअर्स थेट सर्व फिल्टर्सवर स्कॅन करा.")
@@ -864,7 +866,7 @@ elif st.session_state["view_mode"] == "dashboard":
     sc_col1, sc_col2 = st.columns([1.5, 1.5])
 
     with sc_col1:
-        if not use_smart_lists:
+        if not st.session_state["smart_watchlist_toggle"]:
             idx_choice = st.selectbox(
                 lang["select_univ"],
                 [
@@ -1919,20 +1921,44 @@ if st.session_state.get('data_ready', False):
                     key="chart_time_desk_key"
                 )
             with sd_col2:
-                enable_sd_mode = st.checkbox(
-                    "🏛️ Smart Money (SMC) Demand & Supply Mode",
-                    value=True,
-                    key="sd_desk_toggle_mobile_v2"
+                # ಮೊబైల్ టచ్ ఫ్రెండ్లీ st.selectbox (SMC Mode)
+                smc_sel = st.selectbox(
+                    "🏛️ SMC मोड:",
+                    ["Demand & Supply (ON)", "Standard Trend (OFF)"],
+                    index=0,
+                    key="smc_select_mode_mobile"
                 )
+                enable_sd_mode = (smc_sel == "Demand & Supply (ON)")
                 chart_custom_height = st.slider("📏 चार्टची उंची (Chart Height):", min_value=450, max_value=950, value=650, step=50)
             with sd_col3:
-                is_dark_theme = st.checkbox("🌙 Dark Mode Chart", value=True, key="toggle_chart_theme_key_mobile_v2")
+                # మొబైల్ టచ్ ఫ్రెండ్లీ st.selectbox (Dark Mode)
+                dm_sel = st.selectbox(
+                    "🌙 थीम:",
+                    ["Dark Mode", "Light Mode"],
+                    index=0,
+                    key="dark_mode_select_mobile"
+                )
+                is_dark_theme = (dm_sel == "Dark Mode")
 
             ind_col1, ind_col2 = st.columns(2)
             with ind_col1:
-                enable_rsi = st.checkbox("📊 RSI Indicator (14)", value=False, key="toggle_rsi_key_mobile_v2")
+                # మొబైల్ టచ్ ఫ్రెండ్ली st.selectbox (RSI)
+                rsi_sel = st.selectbox(
+                    "📊 RSI (14):",
+                    ["OFF", "ON"],
+                    index=0,
+                    key="rsi_select_mobile"
+                )
+                enable_rsi = (rsi_sel == "ON")
             with ind_col2:
-                enable_macd = st.checkbox("⚡ MACD Indicator", value=False, key="toggle_macd_key_mobile_v2")
+                # మొబైల్ టచ్ ఫ్రెండ్ली st.selectbox (MACD)
+                macd_sel = st.selectbox(
+                    "⚡ MACD:",
+                    ["OFF", "ON"],
+                    index=0,
+                    key="macd_select_mobile"
+                )
+                enable_macd = (macd_sel == "ON")
 
             if chart_type == "W":
                 c_data = weekly_hist.copy()
