@@ -159,18 +159,16 @@ st.markdown("""
         background-color: var(--secondary-background-color) !important;
         border: 1px solid rgba(56, 189, 248, 0.4) !important;
         border-radius: 8px !important;
-        min-height: 38px !important;
-        height: 38px !important;
-        font-size: 14px !important;
+        min-height: 42px !important;
+        font-size: 15px !important;
         font-weight: 600 !important;
     }
     div[data-baseweb="input"] > div {
         background-color: var(--secondary-background-color) !important;
         border: 1px solid rgba(56, 189, 248, 0.4) !important;
         border-radius: 8px !important;
-        min-height: 38px !important;
-        height: 38px !important;
-        font-size: 14px !important;
+        min-height: 42px !important;
+        font-size: 15px !important;
         font-weight: 700 !important;
     }
     .profile-card {
@@ -802,24 +800,23 @@ if st.session_state["view_mode"] == "night_outlook":
 
     st.divider()
 
-    # 👉 निफ्टी ५० आणि बँक निफ्टीच्या परफॉर्मन्ससाठी स्वतंत्र ज्युबरदस्त बॉक्स
     st.markdown("""
     <div class="deal-card-blue">
-        <h3 style="margin-top:0; color:#38bdf8;">🎯 निफ्टी ५० आणि बँक निफ्टी परफॉर्मन्स तर्क व अंदाज (Nifty & Bank Nifty Deep Reasoning)</h3>
+        <h3 style="margin-top:0; color:#38bdf8;">🎯 निफ्टी ५० आणि बँक निफ्टी परफॉर्मन्स तर्क व कारणमीमांसा (Nifty & Bank Nifty Deep Reasoning)</h3>
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px; font-size:15px; margin-top:12px;">
             <div style="background:rgba(0,0,0,0.2); padding:14px; border-radius:8px; border-left:4px solid #10b981;">
-                <h4 style="color:#10b981; margin-top:0;">📊 Nifty 50 Outlook</h4>
+                <h4 style="color:#10b981; margin-top:0;">📊 Nifty 50 Performance Reason</h4>
                 <p style="margin:0; line-height:1.6;">
                     • <b>दिशा:</b> ग्लोबल मार्केट आणि FII कॅश फ्लो पॉझिटिव्ह राहिल्यास बाजार गॅप-अप किंवा पॉझिटिव्ह ओपनिंग देईल.<br>
-                    • <b>महत्त्वाचे कारण:</b> आयटी (IT) आणि ऑटो सेक्टर्समधील संस्थात्मक खरेदीमुळे निफ्टीला मजबूत सपोर्ट मिळतोय.<br>
+                    • <b>मुख्य कारण:</b> आयटी (IT) आणि ऑटो सेक्टर्समधील संस्थात्मक खरेदीमुळे निफ्टीला मजबूत सपोर्ट मिळतोय.<br>
                     • <b>ट्रेडिंग लेव्हल:</b> २४,६५० च्या वर टिकल्यास नवीन उच्चांक संभवतो.
                 </p>
             </div>
             <div style="background:rgba(0,0,0,0.2); padding:14px; border-radius:8px; border-left:4px solid #38bdf8;">
-                <h4 style="color:#38bdf8; margin-top:0;">🏦 Bank Nifty Outlook</h4>
+                <h4 style="color:#38bdf8; margin-top:0;">🏦 Bank Nifty Performance Reason</h4>
                 <p style="margin:0; line-height:1.6;">
                     • <b>दिशा:</b> लार्जकॅप बँकांचे (HDFC, ICICI) व्हॉल्यूम संकेत बुलिश आहेत.<br>
-                    • <b>महत्त्वाचे कारण:</b> DII कडून नियमित खरेदी सुरू असल्याने डिप्सवर (Dips) जोरदार बायिंग येत आहे.<br>
+                    • <b>मुख्य कारण:</b> DII कडून नियमित खरेदी सुरू असल्याने डिप्सवर (Dips) जोरदार बायिंग येत आहे.<br>
                     • <b>ट्रेडिंग लेव्हल:</b> ५१,५०० हा कळीचा सपोर्ट झोन म्हणून काम करेल.
                 </p>
             </div>
@@ -1829,7 +1826,7 @@ if st.session_state.get('data_ready', False):
         bull_driver_3 = f"<b>• सेक्टर आघाडी:</b> <b>{sector_name}</b> सेक्टरमधील शेअर्समध्ये {'सकारात्मक मोमेंटम' if price_change_pct >= 0 else 'कन्सॉलिडेशन'} सुरू आहे."
 
         risk_driver_1 = f"<b>• इंडिया VIX अस्थिरता:</b> VIX <b>{vix_val:.2f}</b> वर आहे ({'⚠️ सावधान: बाजारात मोठी अस्थिरता/व्होलॅटिलिटी आहे' if vix_val > 15 else '✅ शांत: बाजारातील जोखीम नियंत्रणात आहे'})."
-        risk_driver_2 = f"<b>• FII परदेशी फ्लो रिस्क:</b> परदेशी गुंतवणूकदारांचा (FII) कॅश फ्लो <b>{'+' if fii_cash >= 0 else ''}₹{fii_cash:,.0f} Cr</b> राहिल्याने {'बाजार स्थिर आहे' if fii_cash >= 0 else 'वरच्या स्तरावर विक्रीचा धोका संभवतो'}."
+        risk_driver_2 = f"<b>• FII परदेशी फ्लो रिस्क:</b> परदेशी गुंतवणूकदारांचा (FII) कॅश फ्लो <b>{'+' if fii_cash >= 0 else ''}₹{fii_cash:,.0f} Cr</b> राहिल्याने {'बाजार स्थिर आहे' if fii_cash >= 0 else 'वरच्या सरणावर विक्रीचा धोका संभवतो'}."
         risk_driver_3 = f"<b>• स्टॉक मोमेंटम स्थिती:</b> या शेअरचा RSI <b>{latest_rsi:.1f}</b> आहे ({'ओव्हरबॉट रिस्क - नफा बुक करा' if latest_rsi > 70 else ('ओव्हरसोल्ड बाउंसबॅक शक्यता' if latest_rsi < 35 else 'संतुलित खरेदी पातळी')})."
 
         n_col1, n_col2 = st.columns(2)
