@@ -7,7 +7,7 @@ from plotly.subplots import make_subplots
 from curl_cffi import requests
 import xml.etree.ElementTree as ET
 import urllib.parse
-from datetime import datetime, time
+from datetime import datetime
 
 # ==========================================
 # 🚀 UPSTOX LIVE API CONFIGURATION (ALPHA TERMINAL)
@@ -43,6 +43,7 @@ def get_upstox_ltp(symbol_input):
         pass
     return None
 
+# १. पेज कॉन्फिगरेशन
 st.set_page_config(
     page_title="ALPHA TERMINAL PRO ⚡",
     page_icon="⚡",
@@ -546,7 +547,9 @@ def detect_advanced_sd_zones(df):
 
     return list(reversed(final_demand)), list(reversed(final_supply))
 
+# 🌟 NIFTY 50, 100, 500, MIDCAP 100 & SMALLCAP 100 FULL UNIVERSE
 NIFTY_RAW_LIST = [
+    # Nifty 50 & 100
     "RELIANCE", "TCS", "HDFCBANK", "BHARTIARTL", "ICICIBANK", "INFY", "SBIN", "LICI", "ITC", "HINDUNILVR",
     "LT", "BAJFINANCE", "HCLTECH", "M&M", "SUNPHARMA", "MARUTI", "ONGC", "KOTAKBANK", "NTPC", "AXISBANK",
     "TATAMOTORS", "POWERGRID", "ADANIENT", "ADANIPORTS", "COALINDIA", "TRENT", "BAJAJFINSV", "TITAN", "ULTRACEMCO", "WIPRO",
@@ -557,6 +560,8 @@ NIFTY_RAW_LIST = [
     "PIDILITIND", "POLYCAB", "CANBK", "PNB", "MAXHEALTH", "BANKBARODA", "JSWENERGY", "CUMMINSIND", "MOTHERSON", "UNIONBANK",
     "JINDALSTEL", "GODREJCP", "SUZLON", "BOSCHLTD", "TORNTPOWER", "PERSISTENT", "IOB", "CGPOWER", "BHEL", "LUPIN",
     "OFSS", "DIXON", "TORNTPHARM", "AUROPHARMA", "COLPAL", "PRESTIGE", "MARICO", "SOLARINDS", "INDIANB", "BERGEPAINT",
+    
+    # Nifty Midcap 100 & Smallcap 100
     "OBEROIRLTY", "COROMANDEL", "KALYANKJIL", "MUTHOOTFIN", "GICRE", "PHOENIXLTD", "ABCAPITAL", "MAHABANK", "FEDERALBNK", "NHPC",
     "ALKEM", "FACT", "ASTRAL", "PIIND", "UBL", "YESBANK", "ASHOKLEY", "BALKRISIND", "ESCORTS", "PATANJALI",
     "PETRONET", "GMRINFRA", "UNOMINDA", "APOLLOTYRE", "BHARATFORG", "IRCTC", "SUNDARMFIN", "DALBHARAT", "MFSL", "UCOBANK",
@@ -810,7 +815,7 @@ if st.session_state["view_mode"] == "night_outlook":
     # 🔬 Next-Level Scientific AI Market Prediction Boxes
     st.markdown("""
     <div class="deal-card-blue">
-        <h3 style="margin-top:0; color:#38bdf8;">🌐 ১. ग्लोबल मार्केट कोरिलेशन व गिफ्ट निफ्टी (Global Market & Gift Nifty Sentiment)</h3>
+        <h3 style="margin-top:0; color:#38bdf8;">🌐 १. ग्लोबल मार्केट कोरिलेशन व गिफ्ट निफ्टी (Global Market & Gift Nifty Sentiment)</h3>
         <p style="font-size:15px; line-height:1.7;">
             • <b>अमेरिकन बाजार (Dow Jones/Nasdaq):</b> रात्रीच्या सत्रात टेक आणि फायनान्शियल स्टॉक्समध्ये झालेल्या क्लोजिंगच्या आधारावर भारतीय बाजारावर पॉझिटिव्ह मोमेंटम अपेक्षित आहे.<br>
             • <b>गिफ्ट निफ्टी (Gift Nifty) संकेत:</b> सध्या गिफ्ट निफ्टी सपाट ते सकारात्मक झोनमध्ये ट्रेड करत असून, उद्या बाजारात <b>फ्लाट ते हलकी गॅप-अप ओपनिंग (Gap-up Probability: 62%)</b> मिळण्याचे वैज्ञानिक संकेत आहेत.
@@ -869,7 +874,7 @@ elif st.session_state["view_mode"] == "dashboard":
             "🔄 वॉचलिस्ट मोड निवडा:",
             ["Nifty Indices (डिफॉल्ट)", "Smart Watchlists (FII/DII/निकाल)"],
             index=1 if st.session_state["smart_watchlist_toggle"] else 0,
-            key="watchlist_selectbox_mode_v6"
+            key="watchlist_selectbox_mode_final"
         )
         st.session_state["smart_watchlist_toggle"] = (sw_choice == "Smart Watchlists (FII/DII/निकाल)")
 
@@ -1941,7 +1946,7 @@ if st.session_state.get('data_ready', False):
                     "🏛️ SMC मोड:",
                     ["Demand & Supply (ON)", "Standard Trend (OFF)"],
                     index=0,
-                    key="smc_select_mode_mobile_v5"
+                    key="smc_select_mode_mobile_final"
                 )
                 enable_sd_mode = (smc_sel == "Demand & Supply (ON)")
                 chart_custom_height = st.slider("📏 चार्टची उंची (Chart Height):", min_value=450, max_value=950, value=650, step=50)
@@ -1950,7 +1955,7 @@ if st.session_state.get('data_ready', False):
                     "🌙 थीम:",
                     ["Dark Mode", "Light Mode"],
                     index=0,
-                    key="dark_mode_select_mobile_v5"
+                    key="dark_mode_select_mobile_final"
                 )
                 is_dark_theme = (dm_sel == "Dark Mode")
 
@@ -1960,7 +1965,7 @@ if st.session_state.get('data_ready', False):
                     "📊 RSI (14):",
                     ["OFF", "ON"],
                     index=0,
-                    key="rsi_select_mobile_v5"
+                    key="rsi_select_mobile_final"
                 )
                 enable_rsi = (rsi_sel == "ON")
             with ind_col2:
@@ -1968,7 +1973,7 @@ if st.session_state.get('data_ready', False):
                     "⚡ MACD:",
                     ["OFF", "ON"],
                     index=0,
-                    key="macd_select_mobile_v5"
+                    key="macd_select_mobile_final"
                 )
                 enable_macd = (macd_sel == "ON")
 
