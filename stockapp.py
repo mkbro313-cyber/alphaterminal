@@ -546,7 +546,9 @@ def detect_advanced_sd_zones(df):
 
     return list(reversed(final_demand)), list(reversed(final_supply))
 
+# 🌟 NIFTY 50, 100, 500, MIDCAP 100 & SMALLCAP 100 FULL UNIVERSE LIST
 NIFTY_RAW_LIST = [
+    # Nifty 50 & 100
     "RELIANCE", "TCS", "HDFCBANK", "BHARTIARTL", "ICICIBANK", "INFY", "SBIN", "LICI", "ITC", "HINDUNILVR",
     "LT", "BAJFINANCE", "HCLTECH", "M&M", "SUNPHARMA", "MARUTI", "ONGC", "KOTAKBANK", "NTPC", "AXISBANK",
     "TATAMOTORS", "POWERGRID", "ADANIENT", "ADANIPORTS", "COALINDIA", "TRENT", "BAJAJFINSV", "TITAN", "ULTRACEMCO", "WIPRO",
@@ -557,6 +559,8 @@ NIFTY_RAW_LIST = [
     "PIDILITIND", "POLYCAB", "CANBK", "PNB", "MAXHEALTH", "BANKBARODA", "JSWENERGY", "CUMMINSIND", "MOTHERSON", "UNIONBANK",
     "JINDALSTEL", "GODREJCP", "SUZLON", "BOSCHLTD", "TORNTPOWER", "PERSISTENT", "IOB", "CGPOWER", "BHEL", "LUPIN",
     "OFSS", "DIXON", "TORNTPHARM", "AUROPHARMA", "COLPAL", "PRESTIGE", "MARICO", "SOLARINDS", "INDIANB", "BERGEPAINT",
+    
+    # Nifty Midcap 100 & Smallcap 100 Complete Addition
     "OBEROIRLTY", "COROMANDEL", "KALYANKJIL", "MUTHOOTFIN", "GICRE", "PHOENIXLTD", "ABCAPITAL", "MAHABANK", "FEDERALBNK", "NHPC",
     "ALKEM", "FACT", "ASTRAL", "PIIND", "UBL", "YESBANK", "ASHOKLEY", "BALKRISIND", "ESCORTS", "PATANJALI",
     "PETRONET", "GMRINFRA", "UNOMINDA", "APOLLOTYRE", "BHARATFORG", "IRCTC", "SUNDARMFIN", "DALBHARAT", "MFSL", "UCOBANK",
@@ -604,6 +608,13 @@ NIFTY_MIDCAP_100_RAW = [
     "ALKEM", "PETRONET", "MFSL", "DALBHARAT", "SAIL", "IDBI", "MRF", "VOLTAS", "GLENMARK", "MPHASIS",
     "FORTIS", "KPITTECH", "DEEPAKNTR", "EXIDEIND", "BIOCON", "CRISIL", "HUDCO", "ACC", "GODREJPROP",
     "IDFCFIRSTB", "SONACOMS", "COFORGE", "LICHSGFIN", "NMDC", "SJVN", "CENTRALBK", "BLUESTARCO", "OIL"
+]
+
+NIFTY_SMALLCAP_100_RAW = [
+    "CEATLTD", "AMBER", "BSOFT", "CHAMBLFERT", "CAMS", "EXIDEIND", "FINCABLES", "GRINDWELL", "JBCHEPHARM",
+    "KPRMILL", "KPITTECH", "LEMONTREE", "METROPOLIS", "NCC", "PNCINFRA", "PRINCEPIPE", "RADICO", "RBLBANK",
+    "REDINGTON", "ROUTE", "RTNINDIA", "SJVN", "SONACOMS", "SOBHA", "STARHEALTH", "SUNDRMFAST", "SUPREMEIND",
+    "SYNGENE", "TANLA", "TEJASNET", "TIINDIA", "TRITURBINE", "UCOBANK", "VGUARD", "WELSPUNLIV", "ZENSARTECH"
 ]
 
 FII_DII_HEAVY_POOL = ["HDFCBANK", "ICICIBANK", "INFY", "RELIANCE", "TCS", "LT", "TATAPOWER", "BEL", "KOTAKBANK", "SUZLON", "MAZDOCK", "DIXON", "RVNL", "COCHINSHIP", "BHARTIARTL"]
@@ -855,7 +866,7 @@ elif st.session_state["view_mode"] == "dashboard":
             "🔄 वॉचलिस्ट मोड निवडा:",
             ["Nifty Indices (डिफॉल्ट)", "Smart Watchlists (FII/DII/निकाल)"],
             index=1 if st.session_state["smart_watchlist_toggle"] else 0,
-            key="watchlist_selectbox_mode_v4"
+            key="watchlist_selectbox_mode_v5"
         )
         st.session_state["smart_watchlist_toggle"] = (sw_choice == "Smart Watchlists (FII/DII/निकाल)")
 
@@ -872,6 +883,7 @@ elif st.session_state["view_mode"] == "dashboard":
                     "Nifty 50 (टॉप ५० शेअर्स)", 
                     "Nifty 100 (टॉप १०० शेअर्स)", 
                     "Nifty Midcap 100 (मिडकॅप १०० शेअर्स)",
+                    "Nifty Smallcap 100 (स्मॉलकॅप १०० शेअर्स)",
                     f"Nifty 500 (सर्व {len(ALL_NIFTY_SYMBOLS)} शेअर्स)"
                 ],
                 index=0
@@ -882,6 +894,8 @@ elif st.session_state["view_mode"] == "dashboard":
                 selected_pool = tuple(ALL_NIFTY_SYMBOLS[:100])
             elif "Nifty Midcap 100" in idx_choice:
                 selected_pool = tuple([f"{s}.NS" for s in NIFTY_MIDCAP_100_RAW])
+            elif "Nifty Smallcap 100" in idx_choice:
+                selected_pool = tuple([f"{s}.NS" for s in NIFTY_SMALLCAP_100_RAW])
             else:
                 selected_pool = tuple(ALL_NIFTY_SYMBOLS)
         else:
@@ -1924,7 +1938,7 @@ if st.session_state.get('data_ready', False):
                     "🏛️ SMC मोड:",
                     ["Demand & Supply (ON)", "Standard Trend (OFF)"],
                     index=0,
-                    key="smc_select_mode_mobile_v3"
+                    key="smc_select_mode_mobile_v4"
                 )
                 enable_sd_mode = (smc_sel == "Demand & Supply (ON)")
                 chart_custom_height = st.slider("📏 चार्टची उंची (Chart Height):", min_value=450, max_value=950, value=650, step=50)
@@ -1933,7 +1947,7 @@ if st.session_state.get('data_ready', False):
                     "🌙 थीम:",
                     ["Dark Mode", "Light Mode"],
                     index=0,
-                    key="dark_mode_select_mobile_v3"
+                    key="dark_mode_select_mobile_v4"
                 )
                 is_dark_theme = (dm_sel == "Dark Mode")
 
@@ -1943,7 +1957,7 @@ if st.session_state.get('data_ready', False):
                     "📊 RSI (14):",
                     ["OFF", "ON"],
                     index=0,
-                    key="rsi_select_mobile_v3"
+                    key="rsi_select_mobile_v4"
                 )
                 enable_rsi = (rsi_sel == "ON")
             with ind_col2:
@@ -1951,7 +1965,7 @@ if st.session_state.get('data_ready', False):
                     "⚡ MACD:",
                     ["OFF", "ON"],
                     index=0,
-                    key="macd_select_mobile_v3"
+                    key="macd_select_mobile_v4"
                 )
                 enable_macd = (macd_sel == "ON")
 
