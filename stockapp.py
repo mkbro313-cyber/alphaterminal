@@ -551,8 +551,8 @@ NIFTY_RAW_LIST = [
     "LT", "BAJFINANCE", "HCLTECH", "M&M", "SUNPHARMA", "MARUTI", "ONGC", "KOTAKBANK", "NTPC", "AXISBANK",
     "TATAMOTORS", "POWERGRID", "ADANIENT", "ADANIPORTS", "COALINDIA", "TRENT", "BAJAJFINSV", "TITAN", "ULTRACEMCO", "WIPRO",
     "HAL", "VEDL", "BEL", "JSWSTEEL", "SIEMENS", "TATASTEEL", "GRASIM", "IOC", "SBILIFE", "TECHM",
-    "BPCL", "PFC", "HINDALCO", "NESTLEIND", "RECLTD", "ADANIPOWER", "ZOMATO", "ASIANPAINT", "DLF",
-    "VBL", "DIVISLAB", "CHOLAFIN", "GAIL", "BRITANNIA", "CIPLA", "EICHERMOT", "TATAPOWER", "DRREDDY", "BAJAJ-AUTO",
+    "BPCL", "PFC", "HINDALCO", "NESTLEIND", "RECLTD", "ADANIPOWER", "ZOMATO", "ASIANPAINT", "DLF", "VBL",
+    "DIVISLAB", "CHOLAFIN", "GAIL", "BRITANNIA", "CIPLA", "EICHERMOT", "TATAPOWER", "DRREDDY", "BAJAJ-AUTO",
     "LTIM", "HDFCLIFE", "IRFC", "INDIGO", "TVSMOTOR", "HAVELLS", "SHRIRAMFIN", "APOLLOHOSP", "AMBUJACEM", "ABB",
     "PIDILITIND", "POLYCAB", "CANBK", "PNB", "MAXHEALTH", "BANKBARODA", "JSWENERGY", "CUMMINSIND", "MOTHERSON", "UNIONBANK",
     "JINDALSTEL", "GODREJCP", "SUZLON", "BOSCHLTD", "TORNTPOWER", "PERSISTENT", "IOB", "CGPOWER", "BHEL", "LUPIN",
@@ -851,12 +851,11 @@ if st.session_state["view_mode"] == "night_outlook":
 elif st.session_state["view_mode"] == "dashboard":
     sc_mode_col1, sc_mode_col2 = st.columns([1.5, 1.5])
     with sc_mode_col1:
-        # మొబైల్ టచ్ ఫ్రెండ్లీ st.selectbox (इंडेक्स vs स्मार्ट वॉचलिस्ट)
         sw_choice = st.selectbox(
             "🔄 वॉचलिस्ट मोड निवडा:",
             ["Nifty Indices (डिफॉल्ट)", "Smart Watchlists (FII/DII/निकाल)"],
             index=1 if st.session_state["smart_watchlist_toggle"] else 0,
-            key="watchlist_selectbox_mode"
+            key="watchlist_selectbox_mode_v4"
         )
         st.session_state["smart_watchlist_toggle"] = (sw_choice == "Smart Watchlists (FII/DII/निकाल)")
 
@@ -1921,42 +1920,38 @@ if st.session_state.get('data_ready', False):
                     key="chart_time_desk_key"
                 )
             with sd_col2:
-                # ಮೊబైల్ టచ్ ఫ్రెండ్లీ st.selectbox (SMC Mode)
                 smc_sel = st.selectbox(
                     "🏛️ SMC मोड:",
                     ["Demand & Supply (ON)", "Standard Trend (OFF)"],
                     index=0,
-                    key="smc_select_mode_mobile"
+                    key="smc_select_mode_mobile_v3"
                 )
                 enable_sd_mode = (smc_sel == "Demand & Supply (ON)")
                 chart_custom_height = st.slider("📏 चार्टची उंची (Chart Height):", min_value=450, max_value=950, value=650, step=50)
             with sd_col3:
-                # మొబైల్ టచ్ ఫ్రెండ్లీ st.selectbox (Dark Mode)
                 dm_sel = st.selectbox(
                     "🌙 थीम:",
                     ["Dark Mode", "Light Mode"],
                     index=0,
-                    key="dark_mode_select_mobile"
+                    key="dark_mode_select_mobile_v3"
                 )
                 is_dark_theme = (dm_sel == "Dark Mode")
 
             ind_col1, ind_col2 = st.columns(2)
             with ind_col1:
-                # మొబైల్ టచ్ ఫ్రెండ్ली st.selectbox (RSI)
                 rsi_sel = st.selectbox(
                     "📊 RSI (14):",
                     ["OFF", "ON"],
                     index=0,
-                    key="rsi_select_mobile"
+                    key="rsi_select_mobile_v3"
                 )
                 enable_rsi = (rsi_sel == "ON")
             with ind_col2:
-                # మొబైల్ టచ్ ఫ్రెండ్ली st.selectbox (MACD)
                 macd_sel = st.selectbox(
                     "⚡ MACD:",
                     ["OFF", "ON"],
                     index=0,
-                    key="macd_select_mobile"
+                    key="macd_select_mobile_v3"
                 )
                 enable_macd = (macd_sel == "ON")
 
