@@ -59,7 +59,7 @@ LANG_DICT = {
         "outlook_btn": "🌙 AI नाईट मार्केट प्रेडिक्शन (AI Night Outlook)",
         "select_univ": "📊 इंडेक्स युनिव्हर्स निवडा:",
         "select_smart": "🌟 स्मार्ट फंडामेंटल & डील युनिव्हर्स निवडा:",
-        "filter_label": "🎯 अचूक मल्टी-टाइमफ्रेम व पुलबॅक फिल्टर निवडा:",
+        "filter_label": "🎯 स्मार्ट युनिफाइड ट्रेडिंग फिल्टर निवडा:",
         "search_label": "🔍 NSE टिकर सर्च / सिलेक्ट करा:",
         "capital_label": "💼 भांडवल (₹):",
         "risk_label": "🛡️ कमाल रिस्क %:",
@@ -91,7 +91,7 @@ LANG_DICT = {
         "outlook_btn": "🌙 AI नाईट मार्केट प्रेडिक्शन (AI Night Outlook)",
         "select_univ": "📊 इंडेक्स यूनिवर्स चुनें:",
         "select_smart": "🌟 स्मार्ट फंडामेंटल & डील यूनिवर्स चुनें:",
-        "filter_label": "🎯 सटीक मल्टी-टाइमफ्रेम व पुलबैक फ़िल्टर चुनें:",
+        "filter_label": "🎯 स्मार्ट यूनिफाइड ट्रेडिंग फ़िल्टर चुनें:",
         "search_label": "🔍 NSE टिकर सर्च / सेलेक्ट करें:",
         "capital_label": "💼 कैपिटल (₹):",
         "risk_label": "🛡️ अधिकतम रिस्क %:",
@@ -123,7 +123,7 @@ LANG_DICT = {
         "outlook_btn": "🌙 AI Night Market Outlook",
         "select_univ": "📊 Select Index Universe:",
         "select_smart": "🌟 Select Smart Fundamental & Deal Universe:",
-        "filter_label": "🎯 Select Multi-TF & Pullback Filter:",
+        "filter_label": "🎯 Select Smart Unified Filter:",
         "search_label": "🔍 Search / Select NSE Ticker:",
         "capital_label": "💼 Capital (₹):",
         "risk_label": "🛡️ Max Risk %:",
@@ -661,7 +661,6 @@ def scan_nifty_universe(symbols_tuple):
     results = []
     symbols_list = list(symbols_tuple)
     try:
-        # Multi-timeframe historical data fetching for custom breakout calculation
         data = yf.download(symbols_list, period="2y", interval="1d", group_by="ticker", progress=False, threads=True)
         weekly_data = yf.download(symbols_list, period="5y", interval="1wk", group_by="ticker", progress=False, threads=True)
         
@@ -693,24 +692,19 @@ def scan_nifty_universe(symbols_tuple):
                 high_52 = float(df['High'].max())
                 pct_from_high = ((high_52 - curr) / high_52) * 100 if high_52 > 0 else 0.0
 
-                # 🎯 MULTI-TIMEFRAME VOLUME-PRICE BREAKOUTS LOGIC
-                # Yearly Breakout: Close > 250-day High with High Volume
+                # 🎯 MULTI-TIMEFRAME VOLUME-PRICE BREAKOUTS
                 high_1yr = float(df['High'].tail(250).max()) if len(df) >= 250 else high_52
                 is_yearly_breakout = (curr >= high_1yr * 0.99) and (vol_ratio >= 1.5)
 
-                # 6-Month Breakout: Close > 120-day High
                 high_6m = float(df['High'].tail(120).max()) if len(df) >= 120 else high_52
                 is_6m_breakout = (curr >= high_6m * 0.99) and (vol_ratio >= 1.4)
 
-                # 3-Month Breakout: Close > 60-day High
                 high_3m = float(df['High'].tail(60).max()) if len(df) >= 60 else high_52
                 is_3m_breakout = (curr >= high_3m * 0.99) and (vol_ratio >= 1.3)
 
-                # Monthly Breakout: Close > 20-day High
                 high_1m = float(df['High'].tail(20).max()) if len(df) >= 20 else high_52
                 is_monthly_breakout = (curr >= high_1m * 0.99) and (vol_ratio >= 1.2)
 
-                # Weekly Breakout based on weekly dataframe
                 is_weekly_breakout = False
                 if not wk_df.empty and len(wk_df) >= 10:
                     wk_high_prev = float(wk_df['High'].iloc[-2])
@@ -722,13 +716,18 @@ def scan_nifty_universe(symbols_tuple):
                 is_above_200 = (curr > ema_200)
                 is_crossover_active = (ema_20 > ema_50)
                 is_pulled_back_to_20ema = (abs(curr - ema_20) / ema_20 <= 0.015) and (curr < float(df['High'].tail(5).max()))
-
                 is_crossover_pullback = bool(is_above_200 and is_crossover_active and is_pulled_back_to_20ema)
 
                 # 🎯 Original Pullback Setup: 200 EMA + 20/50 Pullback + RSI 50-60
                 near_pullback = (abs(curr - ema_20) / ema_20 <= 0.02) or (abs(curr - ema_50) / ema_50 <= 0.02)
                 rsi_healthy = (50.0 <= rsi_val <= 60.0)
                 is_pullback_setup = bool(is_above_200 and near_pullback and rsi_healthy and (vol_ratio >= 1.1))
+
+                # 🎯 UNIFIED SMART MULTI-TF FILTER (ज्यामध्ये हे सर्व एकाच वेळी समाविष्ट आहेत)
+                is_smart_multi_filter = bool(
+                    is_yearly_breakout or is_6m_breakout or is_3m_breakout or 
+                    is_monthly_breakout or is_weekly_breakout or is_crossover_pullback or is_pullback_setup
+                )
 
                 results.append({
                     "Ticker": ticker,
@@ -740,13 +739,7 @@ def scan_nifty_universe(symbols_tuple):
                     "VolRatio": vol_ratio,
                     "PctFromHigh": pct_from_high,
                     "RSI_Val": rsi_val,
-                    "is_yearly_breakout": is_yearly_breakout,
-                    "is_6m_breakout": is_6m_breakout,
-                    "is_3m_breakout": is_3m_breakout,
-                    "is_monthly_breakout": is_monthly_breakout,
-                    "is_weekly_breakout": is_weekly_breakout,
-                    "is_crossover_pullback": is_crossover_pullback,
-                    "is_pullback_setup": is_pullback_setup,
+                    "is_smart_multi_filter": is_smart_multi_filter,
                     "is_super_bullish": bool(is_above_200 and rsi_val >= 50),
                     "is_vol_breakout": bool(vol_ratio >= 1.20 and chg_pct > 0),
                     "is_near_52w": bool(pct_from_high <= 8.0),
@@ -912,7 +905,7 @@ elif st.session_state["view_mode"] == "dashboard":
             "🔄 वॉचलिस्ट मोड निवडा:",
             ["Nifty Indices (डिफॉल्ट)", "Smart Watchlists (FII/DII/निकाल)"],
             index=1 if st.session_state["smart_watchlist_toggle"] else 0,
-            key="watchlist_selectbox_mode_master"
+            key="watchlist_selectbox_mode_unified"
         )
         st.session_state["smart_watchlist_toggle"] = (sw_choice == "Smart Watchlists (FII/DII/निकाल)")
 
@@ -965,16 +958,13 @@ elif st.session_state["view_mode"] == "dashboard":
                 selected_pool = tuple([f"{s}.NS" for s in HIGH_ORDERS_POOL])
 
     with sc_col2:
-        # 🎯 सर्व मागितलेले मल्टी-टाइमफ्रेम व्हॉल्यूम-प्राइस ब्रेकआउट आणि पुलबॅक फिल्टर्स समाविष्ट
+        # 🎯 सर्व मागितलेले मल्ट-टाइमफ्रेम आणि पुलबॅक लॉजिक आता एकाच स्मार्ट युनिफाइड फिल्टरमध्ये समाविष्ट
         filter_options = [
             "सर्व शेअर्स (All)", 
-            "🔥 Yearly Volume-Price Breakout (१-वर्षीय उच्च व्हॉल्यूम ब्रेकआउट)",
-            "🔥 6-Month Volume-Price Breakout (६-महिने उच्च व्हॉल्यूम ब्रेकआउट)",
-            "🔥 3-Month Volume-Price Breakout (३-महिने उच्च व्हॉल्यूम ब्रेकआउट)",
-            "🔥 Monthly Volume-Price Breakout (मासिक व्हॉल्यूम ब्रेकआउट)",
-            "🔥 Weekly Volume-Price Breakout (साप्ताहिक व्हॉल्यूम ब्रेकआउट)",
-            "🎯 200 EMA Above + 20/50 EMA Crossover + Pullback Buy",
-            "🎯 पुलबॅक बाय सेटअप (200EMA + 20/50 EMA Pullback + RSI 50-60)",
+            "🔥🎯 Multi-TF Breakout & Pullback Setup (Yearly/6M/3M/Monthly/Weekly/Pullback)",
+            "🟢 सुपर बुलिश ब्रेकआउट", 
+            "⚡ व्हॉल्यूम ब्रेकआउट (> 20 SMA)", 
+            "🏆 52W हायच्या जवळ",
             "🏛️ FII/DII संस्थात्मक मोठी खरेदी (Heavy Buying)"
         ]
 
@@ -988,27 +978,18 @@ elif st.session_state["view_mode"] == "dashboard":
         screener_data = scan_nifty_universe(selected_pool)
 
     if not screener_data.empty:
-        if "Yearly Volume-Price Breakout" in flt_choice:
-            filtered_rows = screener_data[screener_data['is_yearly_breakout']].sort_values(by="VolRatio", ascending=False)
-            tag_label = "🔥 Yearly Breakout"
-        elif "6-Month Volume-Price Breakout" in flt_choice:
-            filtered_rows = screener_data[screener_data['is_6m_breakout']].sort_values(by="VolRatio", ascending=False)
-            tag_label = "🔥 6M Breakout"
-        elif "3-Month Volume-Price Breakout" in flt_choice:
-            filtered_rows = screener_data[screener_data['is_3m_breakout']].sort_values(by="VolRatio", ascending=False)
-            tag_label = "🔥 3M Breakout"
-        elif "Monthly Volume-Price Breakout" in flt_choice:
-            filtered_rows = screener_data[screener_data['is_monthly_breakout']].sort_values(by="VolRatio", ascending=False)
-            tag_label = "🔥 Monthly Breakout"
-        elif "Weekly Volume-Price Breakout" in flt_choice:
-            filtered_rows = screener_data[screener_data['is_weekly_breakout']].sort_values(by="VolRatio", ascending=False)
-            tag_label = "🔥 Weekly Breakout"
-        elif "Crossover + Pullback Buy" in flt_choice:
-            filtered_rows = screener_data[screener_data['is_crossover_pullback']].sort_values(by="VolRatio", ascending=False)
-            tag_label = "🎯 Cross+Pullback"
-        elif "पुलबॅक बाय सेटअप" in flt_choice or "Pullback" in flt_choice:
-            filtered_rows = screener_data[screener_data['is_pullback_setup']].sort_values(by="VolRatio", ascending=False)
-            tag_label = "🎯 Pullback Buy"
+        if "Multi-TF Breakout & Pullback" in flt_choice or "Multi-TF" in flt_choice:
+            filtered_rows = screener_data[screener_data['is_smart_multi_filter']].sort_values(by="VolRatio", ascending=False)
+            tag_label = "🔥🎯 Master Setup"
+        elif flt_choice == "🟢 सुपर बुलिश ब्रेकआउट":
+            filtered_rows = screener_data[screener_data['is_super_bullish']].sort_values(by="ChgPct", ascending=False)
+            tag_label = "🟢 बुलिश"
+        elif "व्हॉल्यूम ब्रेकआउट" in flt_choice:
+            filtered_rows = screener_data[screener_data['is_vol_breakout']].sort_values(by="VolRatio", ascending=False)
+            tag_label = "⚡ Vol + 20SMA"
+        elif flt_choice == "🏆 52W हायच्या जवळ":
+            filtered_rows = screener_data[screener_data['is_near_52w']].sort_values(by="PctFromHigh", ascending=True)
+            tag_label = "🏆 52W हाय"
         elif "FII/DII" in flt_choice or "संस्थात्मक" in flt_choice:
             filtered_rows = screener_data[screener_data['is_institutional_heavy']].sort_values(by="VolRatio", ascending=False)
             tag_label = "🏛️ Big Inst. Buy"
@@ -1609,7 +1590,7 @@ if st.session_state.get('data_ready', False):
 
             st.markdown("""
             <div class="pdf-card" style="margin-top:20px;">
-                <h4 style="margin:0; color:#10b981;">⚡ ३. इंट्राडे व स्विंग ट्रेडिंग मास्टर ब्ल्यूप्रिंट</h4>
+                <h4 style="margin-top:0; color:#10b981;">⚡ ३. इंट्राडे व स्विंग ट्रेडिंग मास्टर ब्ल्यूप्रिंट</h4>
                 <p style="font-size:14px; margin:8px 0 12px 0;">
                     • VWAP + 9/15 EMA इंट्राडे पुलबॅक सेटअप व 5-मिनिट एन्ट्री नियम.<br>
                     • स्विंग ट्रेडिंग: 20/50 EMA रिटेस्ट + RSI 60 मोमेंटम ब्रेकआउट फॉर्म्युला.
@@ -1684,7 +1665,7 @@ if st.session_state.get('data_ready', False):
                 {"पॅरामीटर": "200 EMA (दीर्घकालीन ट्रेंड)", "BUY Setup (कधी खरेदी करावे)": "किंमत 200 EMA च्या वर गेल्यास किंवा 200 EMA वर सपोर्ट घेऊन बुलिश कँडल बनवल्यास.", "EXIT Setup (कधी बाहेर पडावे)": "किंमत Daily 200 EMA च्या खाली बंद (Close) झाल्यास त्वरित बाहेर पडावे.", "महत्त्वाचा नियम": "200 EMA खाली स्विंग किंवा पोझिशनल खरेदी कधीही करू नये."},
                 {"पॅरामीटर": "20 & 50 EMA क्रॉसओव्हर", "BUY Setup (कधी खरेदी करावे)": "20 EMA ने 50 EMA ला खालून वर क्रॉस केल्यास (Golden Momentum Cross).", "EXIT Setup (कधी बाहेर पडावे)": "20 EMA ने 50 EMA ला वरून खाली क्रॉस केल्यास किंवा किंमत 50 EMA खाली गेल्यास.", "महत्त्वाचा नियम": "ट्रेंडिंग मार्केटमध्ये 20 EMA हा सर्वोत्तम ट्रेलिंग स्टॉपलॉस असतो."},
                 {"पॅरामीटर": "RSI (14) मोमेंटम", "BUY Setup (कधी खरेदी करावे)": "RSI 40-50 झोनमधून वर वळताना किंवा 60 च्या वर ब्रेकआउट देताना.", "EXIT Setup (कधी बाहेर पडावे)": "RSI 75 च्या वर जाऊन नकारात्मक डायव्हर्जन्स (Bearish Divergence) दिल्यास.", "महत्त्वाचा नियम": "बुल मार्केटमध्ये RSI 60 च्या वर सर्वात वेगवान मोमेंटम मिळतो."},
-                {"पॅरामीटर": "Volume + 20 SMA", "BUY Setup (कधी खरेदी करावे)": "किंमत वाढताना व्हॉल्यूम मागील 20 SMA व्हॉल्यूमपेक्षा 1.5 एक्सेस असल्यास.", "EXIT Setup (कधी बाहेर पडावे)": "मोठ्या व्हॉल्यूमसह लाल कँडल (Institutional Distribution) बनल्यास.", "महत्त्वाचा नियम": "व्हॉल्यूमशिवाय झालेला ब्रेकआउट बहुतांश वेळा खोटा (Fakeout) असतो."},
+                {"पॅरामीटर": "Volume + 20 SMA", "BUY Setup (कधी खरेदी करावे)": "किंमत वाढताना व्हॉल्यूम मागील 20 SMA व्हॉल्यूमपेक्षा 1.5x जास्त असल्यास.", "EXIT Setup (कधी बाहेर पडावे)": "मोठ्या व्हॉल्यूमसह लाल कँडल (Institutional Distribution) बनल्यास.", "महत्त्वाचा नियम": "व्हॉल्यूमशिवाय झालेला ब्रेकआउट बहुतांश वेळा खोटा (Fakeout) असतो."},
                 {"पॅरामीटर": "तिमाही निकाल (Quarterly Results)", "BUY Setup (कधी खरेदी करावे)": "नफ्यात 15%+ वाढ + सकारात्मक भविष्यकालीन मार्गदर्शन (Guidance).", "EXIT Setup (कधी बाहेर पडावे)": "नफ्यात मोठी घट किंवा प्रमोटरकडून निगेटिव्ह कॉमेंट्री आल्यास.", "महत्त्वाचा नियम": "निकाल येण्यापूर्वी जुगार म्हणून ट्रेड घेणे टाळावे."}
             ])
             st.dataframe(df_tech_full, use_container_width=True, hide_index=True)
