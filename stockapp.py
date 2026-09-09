@@ -59,7 +59,7 @@ LANG_DICT = {
         "outlook_btn": "🌙 AI नाईट मार्केट प्रेडिक्शन (AI Night Outlook)",
         "select_univ": "📊 इंडेक्स युनिव्हर्स निवडा:",
         "select_smart": "🌟 स्मार्ट फंडामेंटल युनिव्हर्स निवडा:",
-        "filter_label": "🎯 अचूक ट्रेडिंग फिल्टर निवडा:",
+        "filter_label": "🎯 चार्टिंक प्रो आणि मोमेंटम फिल्टर निवडा:",
         "search_label": "🔍 NSE टिकर सर्च / सिलेक्ट करा:",
         "capital_label": "💼 भांडवल (₹):",
         "risk_label": "🛡️ कमाल रिस्क %:",
@@ -91,7 +91,7 @@ LANG_DICT = {
         "outlook_btn": "🌙 AI नाईट मार्केट प्रेडिक्शन (AI Night Outlook)",
         "select_univ": "📊 इंडेक्स यूनिवर्स चुनें:",
         "select_smart": "🌟 स्मार्ट फंडामेंटल यूनिवर्स चुनें:",
-        "filter_label": "🎯 सटीक ट्रेडिंग फ़िल्टर चुनें:",
+        "filter_label": "🎯 चार्टिंक प्रो और मोमेंटम फ़िल्टर चुनें:",
         "search_label": "🔍 NSE टिकर सर्च / सेलेक्ट करें:",
         "capital_label": "💼 कैपिटल (₹):",
         "risk_label": "🛡️ अधिकतम रिस्क %:",
@@ -123,7 +123,7 @@ LANG_DICT = {
         "outlook_btn": "🌙 AI Night Market Outlook",
         "select_univ": "📊 Select Index Universe:",
         "select_smart": "🌟 Select Smart Fundamental Universe:",
-        "filter_label": "🎯 Select Trading Filter:",
+        "filter_label": "🎯 Select Chartink Pro & Momentum Filter:",
         "search_label": "🔍 Search / Select NSE Ticker:",
         "capital_label": "💼 Capital (₹):",
         "risk_label": "🛡️ Max Risk %:",
@@ -641,14 +641,11 @@ def scan_nifty_universe(symbols_tuple):
     symbols_list = list(symbols_tuple)
     try:
         data = yf.download(symbols_list, period="1y", interval="1d", group_by="ticker", progress=False, threads=True)
-        weekly_data = yf.download(symbols_list, period="2y", interval="1wk", group_by="ticker", progress=False, threads=True)
         
         for ticker in symbols_list:
             try:
                 df = data[ticker].dropna() if ticker in data else pd.DataFrame()
-                wk_df = weekly_data[ticker].dropna() if weekly_data is not None and ticker in weekly_data else pd.DataFrame()
-                
-                if df.empty or len(df) < 50:
+                if df.empty or len(df) < 200:
                     continue
                 
                 curr = float(df['Close'].iloc[-1])
@@ -656,67 +653,56 @@ def scan_nifty_universe(symbols_tuple):
                 if upstox_live and upstox_live > 0:
                     curr = upstox_live
 
-                prev = float(df['Close'].iloc[-2]) if len(df) >= 2 else curr
-                chg_pct = ((curr - prev) / prev) * 100
+                open_p = float(df['Open'].iloc[-1])
+                high_prev = float(df['High'].iloc[-2]) if len(df) >= 2 else curr
                 
-                ema_200 = float(df['Close'].ewm(span=200, adjust=False).mean().iloc[-1]) if len(df) >= 200 else curr
-                ema_50 = float(df['Close'].ewm(span=50, adjust=False).mean().iloc[-1])
+                ema_200 = float(df['Close'].ewm(span=200, adjust=False).mean().iloc[-1])
                 ema_20 = float(df['Close'].ewm(span=20, adjust=False).mean().iloc[-1])
-                rsi_val = float(calculate_rsi(df).iloc[-1])
                 
                 vol_latest = float(df['Volume'].iloc[-1])
-                vol_sma = float(df['Volume'].rolling(20, min_periods=1).mean().iloc[-1])
-                vol_ratio = vol_latest / vol_sma if vol_sma > 0 else 1.0
+                vol_sma_20 = float(df['Volume'].rolling(20, min_periods=1).mean().iloc[-1])
+                vol_ratio = vol_latest / vol_sma_20 if vol_sma_20 > 0 else 1.0
                 
+                rsi_val = float(calculate_rsi(df).iloc[-1])
+                
+                macd, sig, _ = calculate_macd(df)
+                macd_val = float(macd.iloc[-1]) if not macd.empty else 0.0
+                sig_val = float(sig.iloc[-1]) if not sig.empty else 0.0
+
+                # ==========================================
+                # 🔥 CHARTINK PRO FILTER EXACT CONDITIONS
+                # ==========================================
+                cond_1 = (curr > ema_200)                               # [0] daily close > [0] daily ema 200
+                cond_2 = (curr > ema_20)                                # [0] daily close > [0] daily ema 20
+                cond_3 = (curr > open_p)                                # [0] daily close > [0] daily open
+                cond_4 = (curr > high_prev)                             # [0] daily close > [1] daily high
+                cond_5 = (vol_latest > vol_sma_20 * 1.5)                # [0] daily volume > 20 SMA * 1.5
+                cond_6 = (55.0 < rsi_val < 70.0)                        # RSI between 55 and 70
+                cond_7 = (macd_val > sig_val) and (macd_val > 0)        # MACD > Signal & MACD > 0
+                cond_8 = (curr > 100) and (vol_latest > 100000)         # Price > 100 & Vol > 1 Lakh
+
+                is_chartink_pro = bool(cond_1 and cond_2 and cond_3 and cond_4 and cond_5 and cond_6 and cond_7 and cond_8)
+
+                # Fundamental proxies / indicators
                 high_52 = float(df['High'].max())
                 pct_from_high = ((high_52 - curr) / high_52) * 100 if high_52 > 0 else 0.0
-
-                high_1yr = float(df['High'].tail(250).max()) if len(df) >= 250 else high_52
-                is_yearly = (curr >= high_1yr * 0.99) and (vol_ratio >= 1.2)
-
-                high_6m = float(df['High'].tail(120).max()) if len(df) >= 120 else high_52
-                is_6m = (curr >= high_6m * 0.99) and (vol_ratio >= 1.4)
-
-                high_3m = float(df['High'].tail(60).max()) if len(df) >= 60 else high_52
-                is_3m = (curr >= high_3m * 0.99) and (vol_ratio >= 1.3)
-
-                high_1m = float(df['High'].tail(20).max()) if len(df) >= 20 else high_52
-                is_monthly = (curr >= high_1m * 0.99) and (vol_ratio >= 1.2)
-
-                is_weekly = False
-                if not wk_df.empty and len(wk_df) >= 5:
-                    wk_high_prev = float(wk_df['High'].iloc[-2])
-                    wk_vol_prev = float(wk_df['Volume'].iloc[-2])
-                    wk_vol_sma = float(wk_df['Volume'].rolling(5).mean().iloc[-1])
-                    is_weekly = (float(wk_df['Close'].iloc[-1]) > wk_high_prev) and (wk_vol_prev >= wk_vol_sma * 1.1)
-
-                is_above_200 = (curr >= ema_200 * 0.95)
-                is_crossover_active = (ema_20 >= ema_50 * 0.98)
-                is_pulled_back_to_20ema = (abs(curr - ema_20) / ema_20 <= 0.03)
-                is_crossover_pullback = bool(is_above_200 and is_crossover_active and is_pulled_back_to_20ema)
-
-                near_pullback = (abs(curr - ema_20) / ema_20 <= 0.03) or (abs(curr - ema_50) / ema_50 <= 0.03)
-                rsi_healthy = (45.0 <= rsi_val <= 68.0)
-                is_pullback_setup = bool(is_above_200 and near_pullback and rsi_healthy and (vol_ratio >= 1.05))
-
-                is_smart_multi_filter = bool(is_yearly or is_6m or is_3m or is_monthly or is_weekly or is_crossover_pullback or is_pullback_setup)
 
                 results.append({
                     "Ticker": ticker,
                     "LTP": f"₹{curr:.2f}",
-                    "Change": f"{'+' if chg_pct >= 0 else ''}{chg_pct:.2f}%",
+                    "Change": f"{'+' if ((curr-float(df['Close'].iloc[-2]))/float(df['Close'].iloc[-2]))*100 >= 0 else ''}{((curr-float(df['Close'].iloc[-2]))/float(df['Close'].iloc[-2]))*100:.2f}%",
                     "RSI": f"{rsi_val:.1f}",
                     "CurrPrice": curr,
-                    "ChgPct": chg_pct,
+                    "ChgPct": ((curr-float(df['Close'].iloc[-2]))/float(df['Close'].iloc[-2]))*100,
                     "VolRatio": vol_ratio,
                     "PctFromHigh": pct_from_high,
                     "RSI_Val": rsi_val,
-                    "is_smart_multi_filter": is_smart_multi_filter,
+                    "is_chartink_pro": is_chartink_pro,
                     "is_super_bullish": bool(rsi_val >= 50),
-                    "is_vol_breakout": bool(vol_ratio >= 1.15 and chg_pct > 0),
+                    "is_vol_breakout": bool(vol_ratio >= 1.5 and curr > open_p),
                     "is_near_52w": bool(pct_from_high <= 10.0),
                     "is_support_buy": bool(rsi_val <= 45),
-                    "is_institutional_heavy": bool(vol_ratio >= 1.20 and chg_pct > 0.0)
+                    "is_institutional_heavy": bool(vol_ratio >= 1.5)
                 })
             except Exception:
                 continue
@@ -892,7 +878,7 @@ elif st.session_state["view_mode"] == "dashboard":
             "🔄 वॉचलिस्ट मोड निवडा:",
             ["Nifty Indices (डिफॉल्ट)", "Smart Watchlists (FII/DII/निकाल)"],
             index=1 if st.session_state["smart_watchlist_toggle"] else 0,
-            key="watchlist_selectbox_mode_clean"
+            key="watchlist_selectbox_mode_chartink"
         )
         st.session_state["smart_watchlist_toggle"] = (sw_choice == "Smart Watchlists (FII/DII/निकाल)")
 
@@ -945,9 +931,10 @@ elif st.session_state["view_mode"] == "dashboard":
                 selected_pool = tuple([f"{s}.NS" for s in HIGH_ORDERS_POOL])
 
     with sc_col2:
+        # 🔥 चार्टिंक प्रो फिल्टर आता येथे समाविष्ट केला आहे
         filter_options = [
             "सर्व शेअर्स (All)", 
-            "🔥🎯 Multi-TF Breakout & Pullback Setup",
+            "🔥 Chartink Pro: Institutional Breakout & Fundamental Filter",
             "🟢 सुपर बुलिश ब्रेकआउट", 
             "⚡ व्हॉल्यूम ब्रेकआउट (> 20 SMA)", 
             "🏆 52W हायच्या जवळ",
@@ -964,9 +951,9 @@ elif st.session_state["view_mode"] == "dashboard":
         screener_data = scan_nifty_universe(selected_pool)
 
     if not screener_data.empty:
-        if "Multi-TF Breakout & Pullback" in flt_choice or "Multi-TF" in flt_choice:
-            filtered_rows = screener_data[screener_data['is_smart_multi_filter']].sort_values(by="VolRatio", ascending=False)
-            tag_label = "🔥🎯 Master Setup"
+        if "Chartink Pro" in flt_choice:
+            filtered_rows = screener_data[screener_data['is_chartink_pro']].sort_values(by="VolRatio", ascending=False)
+            tag_label = "🔥 Chartink Pro"
         elif flt_choice == "🟢 सुपर बुलिश ब्रेकआउट":
             filtered_rows = screener_data[screener_data['is_super_bullish']].sort_values(by="ChgPct", ascending=False)
             tag_label = "🟢 बुलिश"
@@ -1129,16 +1116,16 @@ if ('loaded_stock' not in st.session_state) or (st.session_state.get('loaded_sto
 if st.session_state.get('data_ready', False):
     daily_hist = st.session_state['daily_hist']
     weekly_hist = st.session_state['weekly_hist']
-    monthly_hist = st.session_state.get('monthly_hist', pd.DataFrame())
-    m3_hist = st.session_state.get('m3_hist', pd.DataFrame())
-    m6_hist = st.session_state.get('m6_hist', pd.DataFrame())
-    y1_hist = st.session_state.get('y1_hist', pd.DataFrame())
+    monthly_hist = st.session_state['monthly_hist'] if 'monthly_hist' in st.session_state else pd.DataFrame()
+    m3_hist = st.session_state['m3_hist'] if 'm3_hist' in st.session_state else pd.DataFrame()
+    m6_hist = st.session_state['m6_hist'] if 'm6_hist' in st.session_state else pd.DataFrame()
+    y1_hist = st.session_state['y1_hist'] if 'y1_hist' in st.session_state else pd.DataFrame()
     info = st.session_state['info']
     major_holders = st.session_state['major_holders']
-    stock_news = st.session_state.get('stock_news', [])
+    stock_news = st.session_state['stock_news'] if 'stock_news' in st.session_state else []
     ticker_name = st.session_state.get('loaded_stock', active_ticker)
-    nifty_hist = st.session_state.get('nifty_hist', pd.DataFrame())
-    vix_hist = st.session_state.get('vix_hist', pd.DataFrame())
+    nifty_hist = st.session_state['nifty_hist'] if 'nifty_hist' in st.session_state else pd.DataFrame()
+    vix_hist = st.session_state['vix_hist'] if 'vix_hist' in st.session_state else pd.DataFrame()
 
     valid_close = daily_hist['Close'].dropna()
     curr_price = float(valid_close.iloc[-1])
