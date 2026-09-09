@@ -54,11 +54,11 @@ LANG_DICT = {
     "मराठी": {
         "title": "⚡ अल्फा टर्मिनल प्रो",
         "subtitle": "इन्स्टिट्यूशनल ट्रेडिंग इंजिन • अपस्टॉक्स लाईव्ह डेटा • एसएमसी डिमांड आणि सप्लाई",
-        "orders_btn": "📑 ऑर्डर्स & निकाल डील्स ⚡",
+        "orders_btn": "📑 एक्सचेंज लाइव्ह अनाउन्समेंट्स ⚡",
         "learning_btn": "📚 शेअर मार्केट लर्निंग हब 💡",
         "outlook_btn": "🌙 AI नाईट मार्केट प्रेडिक्शन (AI Night Outlook)",
         "select_univ": "📊 इंडेक्स युनिव्हर्स निवडा:",
-        "select_smart": "🌟 स्मार्ट फंडामेंटल & डील युनिव्हर्स निवडा:",
+        "select_smart": "🌟 स्मार्ट फंडामेंटल युनिव्हर्स निवडा:",
         "filter_label": "🎯 अचूक मल्टी-टाइमफ्रेम व पुलबॅक फिल्टर निवडा:",
         "search_label": "🔍 NSE टिकर सर्च / सिलेक्ट करा:",
         "capital_label": "💼 भांडवल (₹):",
@@ -86,11 +86,11 @@ LANG_DICT = {
     "हिंदी": {
         "title": "⚡ अल्फा टर्मिनल प्रो",
         "subtitle": "इंस्टीट्यूशनल ट्रेडिंग इंजन • अपस्टॉक्स लाइव डेटा • एसएमसी डिमांड और सप्लाई",
-        "orders_btn": "📑 ऑर्डर्स & रिजल्ट डील्स ⚡",
+        "orders_btn": "📑 एक्सचेंज लाइव अनाउंसमेंट्स ⚡",
         "learning_btn": "📚 शेयर मार्केट लर्निंग हब 💡",
         "outlook_btn": "🌙 AI नाईट मार्केट प्रेडिक्शन (AI Night Outlook)",
         "select_univ": "📊 इंडेक्स यूनिवर्स चुनें:",
-        "select_smart": "🌟 स्मार्ट फंडामेंटल & डील यूनिवर्स चुनें:",
+        "select_smart": "🌟 स्मार्ट फंडामेंटल यूनिवर्स चुनें:",
         "filter_label": "🎯 सटीक मल्टी-टाइमफ्रेम व पुलबैक फ़िल्टर चुनें:",
         "search_label": "🔍 NSE टिकर सर्च / सेलेक्ट करें:",
         "capital_label": "💼 कैपिटल (₹):",
@@ -118,11 +118,11 @@ LANG_DICT = {
     "English": {
         "title": "⚡ ALPHA TERMINAL PRO",
         "subtitle": "Institutional Trading Engine • Upstox Live Data Feed • SMC Demand & Supply",
-        "orders_btn": "📑 Orders & Results Deals ⚡",
+        "orders_btn": "📑 Exchange Live Announcements ⚡",
         "learning_btn": "📚 Stock Market Learning Hub 💡",
         "outlook_btn": "🌙 AI Night Market Outlook",
         "select_univ": "📊 Select Index Universe:",
-        "select_smart": "🌟 Select Smart Fundamental & Deal Universe:",
+        "select_smart": "🌟 Select Smart Fundamental Universe:",
         "filter_label": "🎯 Select Multi-TF & Pullback Filter:",
         "search_label": "🔍 Search / Select NSE Ticker:",
         "capital_label": "💼 Capital (₹):",
@@ -191,27 +191,6 @@ st.markdown("""
         border-radius: 10px;
         padding: 16px 20px;
         margin-top: 14px;
-    }
-    .deal-card-blue {
-        background: linear-gradient(135deg, rgba(2, 132, 199, 0.15) 0%, rgba(16, 185, 129, 0.15) 100%);
-        border: 1px solid rgba(56, 189, 248, 0.6);
-        border-radius: 10px;
-        padding: 14px 18px;
-        margin-bottom: 12px;
-    }
-    .deal-card-green {
-        background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(16, 185, 129, 0.05) 100%);
-        border: 1px solid #10b981;
-        border-radius: 10px;
-        padding: 14px 18px;
-        margin-bottom: 12px;
-    }
-    .deal-card-gold {
-        background: linear-gradient(135deg, rgba(234, 179, 8, 0.18) 0%, rgba(249, 115, 22, 0.12) 100%);
-        border: 1px solid #eab308;
-        border-radius: 10px;
-        padding: 14px 18px;
-        margin-bottom: 12px;
     }
     .pdf-card {
         background: linear-gradient(135deg, rgba(2, 132, 199, 0.12) 0%, rgba(16, 185, 129, 0.12) 100%);
@@ -702,7 +681,7 @@ def scan_nifty_universe(symbols_tuple):
                 is_3m = (curr >= high_3m * 0.99) and (vol_ratio >= 1.3)
 
                 high_1m = float(df['High'].tail(20).max()) if len(df) >= 20 else high_52
-                is_monthly = (curr >= high_1m * 0.99) and (vol_ratio >= 1.1)
+                is_monthly = (curr >= high_1m * 0.99) and (vol_ratio >= 1.2)
 
                 is_weekly = False
                 if not wk_df.empty and len(wk_df) >= 5:
@@ -913,7 +892,7 @@ elif st.session_state["view_mode"] == "dashboard":
             "🔄 वॉचलिस्ट मोड निवडा:",
             ["Nifty Indices (डिफॉल्ट)", "Smart Watchlists (FII/DII/निकाल)"],
             index=1 if st.session_state["smart_watchlist_toggle"] else 0,
-            key="watchlist_selectbox_mode_pure_live"
+            key="watchlist_selectbox_mode_final_live"
         )
         st.session_state["smart_watchlist_toggle"] = (sw_choice == "Smart Watchlists (FII/DII/निकाल)")
 
@@ -1402,164 +1381,23 @@ if st.session_state.get('data_ready', False):
                 st.session_state["view_mode"] = "dashboard"
                 st.rerun()
         with b_c2:
-            st.markdown("<h3 style='margin:0; color:#38bdf8;'>📑 Corporate Orders, Deals & Results Terminal</h3>", unsafe_allow_html=True)
-            st.caption("नवीन ऑर्डर्स, FII/DII ब्लॉक डील्स आणि तिमाही व वार्षिक उत्कृष्ट निकालांचे थेट विश्लेषण.")
+            st.markdown("<h3 style='margin:0; color:#38bdf8;'>📑 Exchange Live Announcements & Corporate Disclosures</h3>", unsafe_allow_html=True)
+            st.caption("NSE आणि BSE च्या अधिकृत पोर्टलवरून ताज्या ऑर्डर्स आणि कॉर्पोरेट अनाउन्समेंट्स थेट तपासा.")
 
         st.divider()
 
-        d_col1, d_col2 = st.columns([1.5, 1.5])
-        with d_col1:
-            deals_universe = st.selectbox(
-                "📊 स्कॅनिंग युनिव्हर्स निवडा:",
-                ["Nifty 50", "Nifty Midcap 100", "Nifty 100", "Nifty 500"],
-                index=0,
-                key="deals_univ_key"
-            )
-        with d_col2:
-            deals_filter_type = st.selectbox(
-                "🎯 ट्रॅकिंग कॅटेगरी निवडा:",
-                [
-                    "१. 🏆 नवीन ऑर्डर्स / कॉन्ट्रॅक्ट्स ट्रॅकर (Order Size vs Market Cap %)",
-                    "२. 🏛️ FII / DII ब्लॉक व बल्क डील्स ट्रॅकर (Institutional Large Deals)",
-                    "३. 📈 उत्कृष्ट तिमाही निकाल ट्रॅकर (Quarterly Best Results + Dates)",
-                    "४. 🌟 तिमाही + वार्षिक दोन्ही उत्कृष्ट निकाल ट्रॅकर (Quarterly + Yearly High Growth)"
-                ],
-                index=0,
-                key="deals_flt_type_key"
-            )
-
-        current_date_str = datetime.now().strftime("%Y-%m-%d")
-        recent_date_1 = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
-        recent_date_2 = (datetime.now() - timedelta(days=2)).strftime("%Y-%m-%d")
-        recent_date_3 = (datetime.now() - timedelta(days=3)).strftime("%Y-%m-%d")
-
-        if "नवीन ऑर्डर्स" in deals_filter_type:
-            st.markdown("#### 🏆 अधिकृत नवीन ऑर्डर्स, प्रोजेक्ट्स आणि कॉन्ट्रॅक्ट्स (Corporate Order Book):")
-            orders_data = [
-                {"Company": "Larsen & Toubro Ltd", "Ticker": "LT.NS", "Date": current_date_str, "Order_Value_Cr": 4250.0, "Project_Scope": "Hydrocarbon Offshore Onshore EPC Project from Middle East", "Execution_Period": "36 Months (3 Years)", "Market_Cap_Cr": 485000.0},
-                {"Company": "Bharat Electronics Ltd", "Ticker": "BEL.NS", "Date": recent_date_1, "Order_Value_Cr": 1150.0, "Project_Scope": "Supply of Next-Gen Radars and Electronic Warfare Suite for Indian Navy", "Execution_Period": "24 Months", "Market_Cap_Cr": 215000.0},
-                {"Company": "BHEL Ltd", "Ticker": "BHEL.NS", "Date": recent_date_2, "Order_Value_Cr": 6100.0, "Project_Scope": "Supercritical Thermal Power Plant EPC Contract from NTPC", "Execution_Period": "48 Months", "Market_Cap_Cr": 98000.0},
-                {"Company": "Mazagon Dock Shipbuilders", "Ticker": "MAZDOCK.NS", "Date": recent_date_3, "Order_Value_Cr": 3100.0, "Project_Scope": "Construction and Delivery of Advanced Stealth Frigates", "Execution_Period": "42 Months", "Market_Cap_Cr": 89000.0}
-            ]
-            df_orders = pd.DataFrame(orders_data)
-            df_orders["Order_Impact_Pct"] = (df_orders["Order_Value_Cr"] / df_orders["Market_Cap_Cr"]) * 100
-
-            for _, o_row in df_orders.iterrows():
-                impact_color = "#10b981" if o_row['Order_Impact_Pct'] >= 4.0 else "#38bdf8"
-                st.markdown(f"""
-                <div class="deal-card-blue">
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <span style="font-weight:800; font-size:17px; color:#38bdf8;">🏢 {o_row['Company']} ({o_row['Ticker']})</span>
-                        <span style="background:rgba(16,185,129,0.2); color:#10b981; font-weight:800; padding:4px 10px; border-radius:6px; font-size:13px;">
-                            📅 तारीख: {o_row['Date']}
-                        </span>
-                    </div>
-                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:12px; margin-top:10px; font-size:14px;">
-                        <div>💰 <b>ऑर्डर मूल्य:</b> <span style="font-size:16px; font-weight:800; color:#10b981;">₹{o_row['Order_Value_Cr']:,.0f} Cr</span></div>
-                        <div>📊 <b>मार्केट कॅपच्या %:</b> <span style="font-size:16px; font-weight:800; color:{impact_color};">+{o_row['Order_Impact_Pct']:.2f}%</span></div>
-                        <div>⏳ <b>कालावधी:</b> <b>{o_row['Execution_Period']}</b></div>
-                    </div>
-                    <div style="margin-top:8px; font-size:14px; opacity:0.9;">
-                        📌 <b>प्रोजेक्ट / कामाचा प्रकार:</b> {o_row['Project_Scope']}
-                    </div>
-                </div>
-                """, unsafe_allow_html=True)
-                if st.button(f"📈 Open {o_row['Ticker']} Chart", key=f"btn_ord_{o_row['Ticker']}", use_container_width=True):
-                    st.session_state["active_ticker"] = o_row['Ticker']
-                    st.session_state["view_mode"] = "chart_desk"
-                    st.rerun()
-
-        elif "FII / DII" in deals_filter_type:
-            st.markdown("#### 🏛️ FII / DII ब्लॉक व बल्क डील्स (Institutional Large Deals):")
-            deals_data = [
-                {"Date": current_date_str, "Company": "HDFC Bank Ltd", "Ticker": "HDFCBANK.NS", "Client_Name": "Morgan Stanley Asia Singapore", "Deal_Type": "BUY (खरेदी)", "Qty": "18,50,000", "Trade_Price": "₹1,640.50", "Total_Val_Cr": 303.5},
-                {"Date": current_date_str, "Company": "Tata Power Company Ltd", "Ticker": "TATAPOWER.NS", "Client_Name": "Nippon India Mutual Fund", "Deal_Type": "BUY (खरेदी)", "Qty": "45,00,000", "Trade_Price": "₹415.20", "Total_Val_Cr": 186.8},
-                {"Date": recent_date_1, "Company": "Kotak Mahindra Bank", "Ticker": "KOTAKBANK.NS", "Client_Name": "Government of Singapore (GIC)", "Deal_Type": "BUY (खरेदी)", "Qty": "12,20,000", "Trade_Price": "₹1,785.00", "Total_Val_Cr": 217.7},
-                {"Date": recent_date_2, "Company": "Bharat Electronics Ltd", "Ticker": "BEL.NS", "Client_Name": "SBI Mutual Fund Multi Cap", "Deal_Type": "BUY (खरेदी)", "Qty": "38,00,000", "Trade_Price": "₹285.50", "Total_Val_Cr": 108.5}
-            ]
-            for _, d_row in pd.DataFrame(deals_data).iterrows():
-                st.markdown(f"""
-                <div class="deal-card-green">
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <span style="font-weight:800; font-size:17px; color:#10b981;">🏢 {d_row['Company']} ({d_row['Ticker']})</span>
-                        <span style="background:rgba(56,189,248,0.2); color:#38bdf8; font-weight:800; padding:4px 10px; border-radius:6px; font-size:13px;">
-                            📅 तारीख: {d_row['Date']}
-                        </span>
-                    </div>
-                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:12px; margin-top:10px; font-size:14px;">
-                        <div>🏛️ <b>गुंतवणूकदार:</b> <span style="color:#ffffff; font-weight:700;">{d_row['Client_Name']}</span></div>
-                        <div>⚡ <b>प्रकार:</b> <span style="color:#10b981; font-weight:800;">{d_row['Deal_Type']}</span></div>
-                        <div>💰 <b>ट्रेड मूल्य:</b> <span style="font-size:16px; font-weight:800; color:#10b981;">₹{d_row['Total_Val_Cr']:,.1f} Cr</span></div>
-                        <div>🔢 <b>शेअर्स:</b> <b>{d_row['Qty']}</b> (@ {d_row['Trade_Price']})</div>
-                    </div>
-                </div>
-                """, unsafe_allow_html=True)
-                if st.button(f"📈 Open {d_row['Ticker']} Chart", key=f"btn_dl_{d_row['Ticker']}", use_container_width=True):
-                    st.session_state["active_ticker"] = d_row['Ticker']
-                    st.session_state["view_mode"] = "chart_desk"
-                    st.rerun()
-
-        elif "तिमाही निकाल" in deals_filter_type and "वार्षिक" not in deals_filter_type:
-            st.markdown("#### 📈 नुकतेच जाहीर झालेले उत्कृष्ट तिमाही निकाल (Quarterly Best Results & Dates):")
-            q_results_data = [
-                {"Company": "Trent Ltd", "Ticker": "TRENT.NS", "Date": current_date_str, "Net_Profit_Growth": "+134.0%", "Revenue_Growth": "+56.2%", "EBITDA_Margin": "18.5%", "Highlights": "Zudio आणि Westside च्या विक्रीत विक्रमी वाढ, नफ्यात दुप्पट वाढ."},
-                {"Company": "Dixon Technologies Ltd", "Ticker": "DIXON.NS", "Date": recent_date_1, "Net_Profit_Growth": "+108.5%", "Revenue_Growth": "+101.4%", "EBITDA_Margin": "4.2%", "Highlights": "मोबाईल आणि इलेक्ट्रॉनिक्स मॅन्युफॅक्चरिंगमध्ये विक्रमी ऑर्डर्स व महसूल दुप्पट."},
-                {"Company": "Kaynes Technology India", "Ticker": "KAYNES.NS", "Date": recent_date_2, "Net_Profit_Growth": "+86.4%", "Revenue_Growth": "+69.8%", "EBITDA_Margin": "14.8%", "Highlights": "सेमिकंडक्टर, रेल्वे व एरोस्पेस ऑर्डर बुकमध्ये विक्रमी वाढ."}
-            ]
-            for _, q_row in pd.DataFrame(q_results_data).iterrows():
-                st.markdown(f"""
-                <div class="deal-card-green">
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <span style="font-weight:800; font-size:17px; color:#10b981;">🏢 {q_row['Company']} ({q_row['Ticker']})</span>
-                        <span style="background:rgba(16,185,129,0.2); color:#10b981; font-weight:800; padding:4px 10px; border-radius:6px; font-size:13px;">
-                            📅 निकाल तारीख: {q_row['Date']}
-                        </span>
-                    </div>
-                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:12px; margin-top:10px; font-size:14px;">
-                        <div>💰 <b>निव्वळ नफा वाढ:</b> <span style="font-size:16px; font-weight:800; color:#10b981;">{q_row['Net_Profit_Growth']}</span></div>
-                        <div>📊 <b>विक्री महसूल वाढ:</b> <span style="font-size:16px; font-weight:800; color:#38bdf8;">{q_row['Revenue_Growth']}</span></div>
-                        <div>💎 <b>EBITDA Margin:</b> <b>{q_row['EBITDA_Margin']}</b></div>
-                    </div>
-                    <div style="margin-top:8px; font-size:14px; opacity:0.9;">
-                        📌 <b>निकाल हायलाइट्स:</b> {q_row['Highlights']}
-                    </div>
-                </div>
-                """, unsafe_allow_html=True)
-                if st.button(f"📈 Open {q_row['Ticker']} Chart", key=f"btn_q_{q_row['Ticker']}", use_container_width=True):
-                    st.session_state["active_ticker"] = q_row['Ticker']
-                    st.session_state["view_mode"] = "chart_desk"
-                    st.rerun()
-
-        else:
-            st.markdown("#### 🌟 तिमाही + वार्षिक दोन्ही निकालांमध्ये अव्वल वाढ असलेले शेअर्स (All-Round Growth Stars):")
-            qy_results_data = [
-                {"Company": "Trent Ltd", "Ticker": "TRENT.NS", "Date": current_date_str, "Q_Profit_Growth": "+134.0%", "Three_Yr_CAGR": "+82.4% p.a.", "Five_Yr_CAGR": "+54.1% p.a.", "ROE": "31.2%", "Verdict": "तिमाही आणि दीर्घकालीन वार्षिक दोन्ही निकालात अव्वल."},
-                {"Company": "Varun Beverages Ltd", "Ticker": "VBL.NS", "Date": recent_date_1, "Q_Profit_Growth": "+38.5%", "Three_Yr_CAGR": "+68.2% p.a.", "Five_Yr_CAGR": "+51.4% p.a.", "ROE": "34.5%", "Verdict": "आफ्रिका विस्तार + मजबूत देशांतर्गत उन्हाळी विक्रीचा सातत्यपूर्ण फायदा."}
-            ]
-            for _, qy_row in pd.DataFrame(qy_results_data).iterrows():
-                st.markdown(f"""
-                <div class="deal-card-gold">
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <span style="font-weight:800; font-size:17px; color:#eab308;">🏆 {qy_row['Company']} ({qy_row['Ticker']})</span>
-                        <span style="background:rgba(234,179,8,0.25); color:#eab308; font-weight:800; padding:4px 10px; border-radius:6px; font-size:13px;">
-                            📅 निकाल तारीख: {qy_row['Date']}
-                        </span>
-                    </div>
-                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:12px; margin-top:10px; font-size:14px;">
-                        <div>⚡ <b>तिमाही नफा वाढ:</b> <span style="font-size:16px; font-weight:800; color:#10b981;">{qy_row['Q_Profit_Growth']}</span></div>
-                        <div>📈 <b>३-वर्षे वार्षिक CAGR:</b> <span style="font-size:16px; font-weight:800; color:#eab308;">{qy_row['Three_Yr_CAGR']}</span></div>
-                        <div>🚀 <b>५-वर्षे वार्षिक CAGR:</b> <span style="font-size:16px; font-weight:800; color:#38bdf8;">{qy_row['Five_Yr_CAGR']}</span></div>
-                        <div>💎 <b>ROE:</b> <b>{qy_row['ROE']}</b></div>
-                    </div>
-                    <div style="margin-top:8px; font-size:14px; opacity:0.9;">
-                        📌 <b>तज्ज्ञ निष्कर्ष:</b> {qy_row['Verdict']}
-                    </div>
-                </div>
-                """, unsafe_allow_html=True)
-                if st.button(f"📈 Open {qy_row['Ticker']} Chart", key=f"btn_qy_{qy_row['Ticker']}", use_container_width=True):
-                    st.session_state["active_ticker"] = qy_row['Ticker']
-                    st.session_state["view_mode"] = "chart_desk"
-                    st.rerun()
+        st.markdown("""
+        <div class="deal-card-blue">
+            <h3 style="margin-top:0; color:#38bdf8;">🌐 अधिकृत एक्सचेंज लाइव्ह लिंक्स (Official Live Exchange Portals)</h3>
+            <p style="font-size:16px; line-height:1.8;">
+                कोणत्याही कंपनीला मिळालेली नवी ऑर्डर, करार किंवा बल्क/ब्लॉक डील्स थेट एक्सचेेंजच्या सर्व्हरवरून सेकंदा सेकंदाला पाहण्यासाठी खालील अधिकृत लिंक्स वापरू शकता:
+            </p>
+            <div style="margin-top:15px; display:flex; gap:15px; flex-wrap:wrap;">
+                <a href="https://www.nseindia.com/companies-listing/corporate-filings-announcements" target="_blank" style="background:#0284c7; color:white; padding:10px 20px; border-radius:8px; text-decoration:none; font-weight:700;">🔗 NSE Live Corporate Filings</a>
+                <a href="https://www.bseindia.com/corporates/ann.aspx" target="_blank" style="background:#059669; color:white; padding:10px 20px; border-radius:8px; text-decoration:none; font-weight:700;">🔗 BSE Live Announcements</a>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
 
     elif st.session_state["view_mode"] == "learning_hub":
         b_c1, b_c2 = st.columns([1.5, 4.5])
