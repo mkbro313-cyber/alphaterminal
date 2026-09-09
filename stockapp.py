@@ -696,10 +696,10 @@ def scan_nifty_universe(symbols_tuple):
                 is_yearly = (curr >= high_1yr * 0.99) and (vol_ratio >= 1.2)
 
                 high_6m = float(df['High'].tail(120).max()) if len(df) >= 120 else high_52
-                is_6m = (curr >= high_6m * 0.99) and (vol_ratio >= 1.2)
+                is_6m = (curr >= high_6m * 0.99) and (vol_ratio >= 1.4)
 
                 high_3m = float(df['High'].tail(60).max()) if len(df) >= 60 else high_52
-                is_3m = (curr >= high_3m * 0.99) and (vol_ratio >= 1.2)
+                is_3m = (curr >= high_3m * 0.99) and (vol_ratio >= 1.3)
 
                 high_1m = float(df['High'].tail(20).max()) if len(df) >= 20 else high_52
                 is_monthly = (curr >= high_1m * 0.99) and (vol_ratio >= 1.1)
@@ -913,7 +913,7 @@ elif st.session_state["view_mode"] == "dashboard":
             "🔄 वॉचलिस्ट मोड निवडा:",
             ["Nifty Indices (डिफॉल्ट)", "Smart Watchlists (FII/DII/निकाल)"],
             index=1 if st.session_state["smart_watchlist_toggle"] else 0,
-            key="watchlist_selectbox_mode_final_ok"
+            key="watchlist_selectbox_mode_pure_live"
         )
         st.session_state["smart_watchlist_toggle"] = (sw_choice == "Smart Watchlists (FII/DII/निकाल)")
 
@@ -1982,7 +1982,7 @@ if st.session_state.get('data_ready', False):
                     "🏛️ SMC मोड:",
                     ["Demand & Supply (ON)", "Standard Trend (OFF)"],
                     index=0,
-                    key="smc_select_mode_mobile_perfect_v2"
+                    key="smc_select_mode_mobile_pure"
                 )
                 enable_sd_mode = (smc_sel == "Demand & Supply (ON)")
                 chart_custom_height = st.slider("📏 चार्टची उंची (Chart Height):", min_value=450, max_value=950, value=650, step=50)
@@ -1991,7 +1991,7 @@ if st.session_state.get('data_ready', False):
                     "🌙 थीम:",
                     ["Dark Mode", "Light Mode"],
                     index=0,
-                    key="dark_mode_select_mobile_perfect_v2"
+                    key="dark_mode_select_mobile_pure"
                 )
                 is_dark_theme = (dm_sel == "Dark Mode")
 
@@ -2001,7 +2001,7 @@ if st.session_state.get('data_ready', False):
                     "📊 RSI (14):",
                     ["OFF", "ON"],
                     index=0,
-                    key="rsi_select_mobile_perfect_v2"
+                    key="rsi_select_mobile_pure"
                 )
                 enable_rsi = (rsi_sel == "ON")
             with ind_col2:
@@ -2009,7 +2009,7 @@ if st.session_state.get('data_ready', False):
                     "⚡ MACD:",
                     ["OFF", "ON"],
                     index=0,
-                    key="macd_select_mobile_perfect_v2"
+                    key="macd_select_mobile_pure"
                 )
                 enable_macd = (macd_sel == "ON")
 
