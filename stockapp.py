@@ -913,7 +913,7 @@ elif st.session_state["view_mode"] == "dashboard":
             "🔄 वॉचलिस्ट मोड निवडा:",
             ["Nifty Indices (डिफॉल्ट)", "Smart Watchlists (FII/DII/निकाल)"],
             index=1 if st.session_state["smart_watchlist_toggle"] else 0,
-            key="watchlist_selectbox_mode_pure_live"
+            key="watchlist_selectbox_mode_final_ok"
         )
         st.session_state["smart_watchlist_toggle"] = (sw_choice == "Smart Watchlists (FII/DII/निकाल)")
 
@@ -1982,7 +1982,7 @@ if st.session_state.get('data_ready', False):
                     "🏛️ SMC मोड:",
                     ["Demand & Supply (ON)", "Standard Trend (OFF)"],
                     index=0,
-                    key="smc_select_mode_mobile_pure"
+                    key="smc_select_mode_mobile_perfect_v2"
                 )
                 enable_sd_mode = (smc_sel == "Demand & Supply (ON)")
                 chart_custom_height = st.slider("📏 चार्टची उंची (Chart Height):", min_value=450, max_value=950, value=650, step=50)
@@ -1991,7 +1991,7 @@ if st.session_state.get('data_ready', False):
                     "🌙 थीम:",
                     ["Dark Mode", "Light Mode"],
                     index=0,
-                    key="dark_mode_select_mobile_pure"
+                    key="dark_mode_select_mobile_perfect_v2"
                 )
                 is_dark_theme = (dm_sel == "Dark Mode")
 
@@ -2001,7 +2001,7 @@ if st.session_state.get('data_ready', False):
                     "📊 RSI (14):",
                     ["OFF", "ON"],
                     index=0,
-                    key="rsi_select_mobile_pure"
+                    key="rsi_select_mobile_perfect_v2"
                 )
                 enable_rsi = (rsi_sel == "ON")
             with ind_col2:
@@ -2009,7 +2009,7 @@ if st.session_state.get('data_ready', False):
                     "⚡ MACD:",
                     ["OFF", "ON"],
                     index=0,
-                    key="macd_select_mobile_pure"
+                    key="macd_select_mobile_perfect_v2"
                 )
                 enable_macd = (macd_sel == "ON")
 
