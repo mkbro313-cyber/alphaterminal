@@ -59,7 +59,7 @@ LANG_DICT = {
         "outlook_btn": "🌙 AI नाईट मार्केट प्रेडिक्शन (AI Night Outlook)",
         "select_univ": "📊 इंडेक्स युनिव्हर्स निवडा:",
         "select_smart": "🌟 स्मार्ट फंडामेंटल & डील युनिव्हर्स निवडा:",
-        "filter_label": "🎯 स्मार्ट युनिफाइड ट्रेडिंग फिल्टर निवडा:",
+        "filter_label": "🎯 अचूक मल्टी-टाइमफ्रेम व पुलबॅक फिल्टर निवडा:",
         "search_label": "🔍 NSE टिकर सर्च / सिलेक्ट करा:",
         "capital_label": "💼 भांडवल (₹):",
         "risk_label": "🛡️ कमाल रिस्क %:",
@@ -91,7 +91,7 @@ LANG_DICT = {
         "outlook_btn": "🌙 AI नाईट मार्केट प्रेडिक्शन (AI Night Outlook)",
         "select_univ": "📊 इंडेक्स यूनिवर्स चुनें:",
         "select_smart": "🌟 स्मार्ट फंडामेंटल & डील यूनिवर्स चुनें:",
-        "filter_label": "🎯 स्मार्ट यूनिफाइड ट्रेडिंग फ़िल्टर चुनें:",
+        "filter_label": "🎯 सटीक मल्टी-टाइमफ्रेम व पुलबैक फ़िल्टर चुनें:",
         "search_label": "🔍 NSE टिकर सर्च / सेलेक्ट करें:",
         "capital_label": "💼 कैपिटल (₹):",
         "risk_label": "🛡️ अधिकतम रिस्क %:",
@@ -123,7 +123,7 @@ LANG_DICT = {
         "outlook_btn": "🌙 AI Night Market Outlook",
         "select_univ": "📊 Select Index Universe:",
         "select_smart": "🌟 Select Smart Fundamental & Deal Universe:",
-        "filter_label": "🎯 Select Smart Unified Filter:",
+        "filter_label": "🎯 Select Multi-TF & Pullback Filter:",
         "search_label": "🔍 Search / Select NSE Ticker:",
         "capital_label": "💼 Capital (₹):",
         "risk_label": "🛡️ Max Risk %:",
@@ -692,7 +692,6 @@ def scan_nifty_universe(symbols_tuple):
                 high_52 = float(df['High'].max())
                 pct_from_high = ((high_52 - curr) / high_52) * 100 if high_52 > 0 else 0.0
 
-                # 🎯 SINGLE UNIFIED SMART MULTI-TF BREAKOUT & PULLBACK SETUP LOGIC
                 high_1yr = float(df['High'].tail(250).max()) if len(df) >= 250 else high_52
                 is_yearly = (curr >= high_1yr * 0.99) and (vol_ratio >= 1.5)
 
@@ -721,7 +720,6 @@ def scan_nifty_universe(symbols_tuple):
                 rsi_healthy = (50.0 <= rsi_val <= 60.0)
                 is_pullback_setup = bool(is_above_200 and near_pullback and rsi_healthy and (vol_ratio >= 1.1))
 
-                # एकाच युनिफाइड फिल्टरमध्ये सर्व अटी
                 is_smart_multi_filter = bool(is_yearly or is_6m or is_3m or is_monthly or is_weekly or is_crossover_pullback or is_pullback_setup)
 
                 results.append({
@@ -839,16 +837,21 @@ if st.session_state["view_mode"] == "night_outlook":
 
     st.divider()
 
-    # 📊 डायनॅमिक कॅल्क्युलेटेड नाईट प्रेडिक्शन (Live Data Based Calculation)
-    nifty_close_val = 23873.45
-    bank_nifty_val = 51500.0
-    vix_val = 14.2
-    if not nifty_hist.empty:
-        nifty_close_val = float(nifty_hist['Close'].iloc[-1])
-        
-    calc_pivot = nifty_close_val
-    calc_r1 = round(calc_pivot * 1.008, 2)
-    calc_s1 = round(calc_pivot * 0.992, 2)
+    # 🛡️ Safe Live Data Retrieval for Nifty & VIX (No NameError)
+    nifty_close_val = 24500.0
+    vix_val = 14.0
+    try:
+        nifty_live_df = yf.Ticker("^NSEI").history(period="5d", interval="1d")
+        vix_live_df = yf.Ticker("^INDIAVIX").history(period="5d", interval="1d")
+        if not nifty_live_df.empty:
+            nifty_close_val = float(nifty_live_df['Close'].iloc[-1])
+        if not vix_live_df.empty:
+            vix_val = float(vix_live_df['Close'].iloc[-1])
+    except Exception:
+        pass
+
+    calc_r1 = round(nifty_close_val * 1.008, 2)
+    calc_s1 = round(nifty_close_val * 0.992, 2)
 
     st.markdown(f"""
     <div class="deal-card-blue">
@@ -865,7 +868,7 @@ if st.session_state["view_mode"] == "night_outlook":
         <h3 style="margin-top:0; color:#10b981;">📊 २. इन्स्टिट्यूशनल ओपन इंटरेस्ट (OI) आणि PCR (Put-Call Ratio) बायस</h3>
         <p style="font-size:15px; line-height:1.7;">
             • <b>पुट-कॉल रेशो (PCR):</b> सध्याचा लाइव्ह PCR <b>1.21</b> असून, ऑप्शन रायटर्सचा सपोर्ट खालील पुट साईडला मजबूत आहे.<br>
-            • <b>निष्कर्ष:</b> मार्केट ओव्हरसोल्ड झोनमधून बाहेर येऊन अपट्रेंड कायम ठेवण्याच्या तयारीत आहे.
+            • <b>निष्कर्ष:</b> मार्केट ओव्हरसोल्ड झोनमधून बाहेर होऊन अपट्रेंड कायम ठेवण्याच्या तयारीत आहे.
         </p>
     </div>
     """, unsafe_allow_html=True)
@@ -886,7 +889,7 @@ if st.session_state["view_mode"] == "night_outlook":
         <div class="deal-card-blue">
             <h4 style="margin-top:0; color:#38bdf8;">⚡ ४. व्होलॅटिलिटी इंडेक्स (India VIX) रिस्क मॅट्रिक्स</h4>
             <p style="font-size:15px; line-height:1.7;">
-                • <b>सध्याची VIX पातळी:</b> {vix_val} (स्थिर).<br>
+                • <b>सध्याची VIX पातळी:</b> {vix_val:.2f} (स्थिर).<br>
                 • <b>ट्रेडिंग गणित:</b> VIX नियंत्रणात असल्याने ATR-आधारित टाईट स्टॉपलॉस वापरून सुरक्षित ट्रेड घेता येईल.
             </p>
         </div>
@@ -911,7 +914,7 @@ elif st.session_state["view_mode"] == "dashboard":
             "🔄 वॉचलिस्ट मोड निवडा:",
             ["Nifty Indices (डिफॉल्ट)", "Smart Watchlists (FII/DII/निकाल)"],
             index=1 if st.session_state["smart_watchlist_toggle"] else 0,
-            key="watchlist_selectbox_mode_dynamic"
+            key="watchlist_selectbox_mode_fixed"
         )
         st.session_state["smart_watchlist_toggle"] = (sw_choice == "Smart Watchlists (FII/DII/निकाल)")
 
@@ -964,10 +967,9 @@ elif st.session_state["view_mode"] == "dashboard":
                 selected_pool = tuple([f"{s}.NS" for s in HIGH_ORDERS_POOL])
 
     with sc_col2:
-        # 🎯 सर्व मागितलेले मल्टि-टाइमफ्रेम आणि पुलबॅक लॉजिक आता एकाच स्मार्ट युनिफाइड फिल्टरमध्ये समाविष्ट
         filter_options = [
             "सर्व शेअर्स (All)", 
-            "🔥🎯 Multi-TF Breakout & Pullback Setup (Yearly/6M/3M/Monthly/Weekly/Pullback)",
+            "🔥🎯 Multi-TF Breakout & Pullback Setup",
             "🟢 सुपर बुलिश ब्रेकआउट", 
             "⚡ व्हॉल्यूम ब्रेकआउट (> 20 SMA)", 
             "🏆 52W हायच्या जवळ",
@@ -1976,7 +1978,7 @@ if st.session_state.get('data_ready', False):
                     "🏛️ SMC मोड:",
                     ["Demand & Supply (ON)", "Standard Trend (OFF)"],
                     index=0,
-                    key="smc_select_mode_mobile_final"
+                    key="smc_select_mode_mobile_fixed"
                 )
                 enable_sd_mode = (smc_sel == "Demand & Supply (ON)")
                 chart_custom_height = st.slider("📏 चार्टची उंची (Chart Height):", min_value=450, max_value=950, value=650, step=50)
@@ -1985,7 +1987,7 @@ if st.session_state.get('data_ready', False):
                     "🌙 थीम:",
                     ["Dark Mode", "Light Mode"],
                     index=0,
-                    key="dark_mode_select_mobile_final"
+                    key="dark_mode_select_mobile_fixed"
                 )
                 is_dark_theme = (dm_sel == "Dark Mode")
 
@@ -1995,7 +1997,7 @@ if st.session_state.get('data_ready', False):
                     "📊 RSI (14):",
                     ["OFF", "ON"],
                     index=0,
-                    key="rsi_select_mobile_final"
+                    key="rsi_select_mobile_fixed"
                 )
                 enable_rsi = (rsi_sel == "ON")
             with ind_col2:
@@ -2003,7 +2005,7 @@ if st.session_state.get('data_ready', False):
                     "⚡ MACD:",
                     ["OFF", "ON"],
                     index=0,
-                    key="macd_select_mobile_final"
+                    key="macd_select_mobile_fixed"
                 )
                 enable_macd = (macd_sel == "ON")
 
