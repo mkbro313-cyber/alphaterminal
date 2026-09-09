@@ -913,7 +913,7 @@ elif st.session_state["view_mode"] == "dashboard":
             "🔄 वॉचलिस्ट मोड निवडा:",
             ["Nifty Indices (डिफॉल्ट)", "Smart Watchlists (FII/DII/निकाल)"],
             index=1 if st.session_state["smart_watchlist_toggle"] else 0,
-            key="watchlist_selectbox_mode_safe"
+            key="watchlist_selectbox_mode_master_v2"
         )
         st.session_state["smart_watchlist_toggle"] = (sw_choice == "Smart Watchlists (FII/DII/निकाल)")
 
@@ -1428,7 +1428,6 @@ if st.session_state.get('data_ready', False):
                 key="deals_flt_type_key"
             )
 
-        # 🔄 Dynamic Current Date calculation for orders to ensure fresh dates
         current_date_str = datetime.now().strftime("%Y-%m-%d")
         recent_date_1 = (datetime.now() - timedelta(days=2)).strftime("%Y-%m-%d")
         recent_date_2 = (datetime.now() - timedelta(days=4)).strftime("%Y-%m-%d")
