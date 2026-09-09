@@ -656,20 +656,20 @@ SECTOR_TOP_STOCKS_MAP = {
     "NIFTY INFRA": ["LT.NS", "BHARTIARTL.NS", "ULTRACEMCO.NS"]
 }
 
-@st.cache_data(ttl=600)
+@st.cache_data(ttl=60)
 def scan_nifty_universe(symbols_tuple):
     results = []
     symbols_list = list(symbols_tuple)
     try:
-        data = yf.download(symbols_list, period="2y", interval="1d", group_by="ticker", progress=False, threads=True)
-        weekly_data = yf.download(symbols_list, period="5y", interval="1wk", group_by="ticker", progress=False, threads=True)
+        data = yf.download(symbols_list, period="1y", interval="1d", group_by="ticker", progress=False, threads=True)
+        weekly_data = yf.download(symbols_list, period="2y", interval="1wk", group_by="ticker", progress=False, threads=True)
         
         for ticker in symbols_list:
             try:
                 df = data[ticker].dropna() if ticker in data else pd.DataFrame()
                 wk_df = weekly_data[ticker].dropna() if weekly_data is not None and ticker in weekly_data else pd.DataFrame()
                 
-                if df.empty or len(df) < 200:
+                if df.empty or len(df) < 50:
                     continue
                 
                 curr = float(df['Close'].iloc[-1])
@@ -680,7 +680,7 @@ def scan_nifty_universe(symbols_tuple):
                 prev = float(df['Close'].iloc[-2]) if len(df) >= 2 else curr
                 chg_pct = ((curr - prev) / prev) * 100
                 
-                ema_200 = float(df['Close'].ewm(span=200, adjust=False).mean().iloc[-1])
+                ema_200 = float(df['Close'].ewm(span=200, adjust=False).mean().iloc[-1]) if len(df) >= 200 else curr
                 ema_50 = float(df['Close'].ewm(span=50, adjust=False).mean().iloc[-1])
                 ema_20 = float(df['Close'].ewm(span=20, adjust=False).mean().iloc[-1])
                 rsi_val = float(calculate_rsi(df).iloc[-1])
@@ -693,32 +693,32 @@ def scan_nifty_universe(symbols_tuple):
                 pct_from_high = ((high_52 - curr) / high_52) * 100 if high_52 > 0 else 0.0
 
                 high_1yr = float(df['High'].tail(250).max()) if len(df) >= 250 else high_52
-                is_yearly = (curr >= high_1yr * 0.99) and (vol_ratio >= 1.5)
+                is_yearly = (curr >= high_1yr * 0.99) and (vol_ratio >= 1.2)
 
                 high_6m = float(df['High'].tail(120).max()) if len(df) >= 120 else high_52
-                is_6m = (curr >= high_6m * 0.99) and (vol_ratio >= 1.4)
+                is_6m = (curr >= high_6m * 0.99) and (vol_ratio >= 1.2)
 
                 high_3m = float(df['High'].tail(60).max()) if len(df) >= 60 else high_52
-                is_3m = (curr >= high_3m * 0.99) and (vol_ratio >= 1.3)
+                is_3m = (curr >= high_3m * 0.99) and (vol_ratio >= 1.2)
 
                 high_1m = float(df['High'].tail(20).max()) if len(df) >= 20 else high_52
-                is_monthly = (curr >= high_1m * 0.99) and (vol_ratio >= 1.2)
+                is_monthly = (curr >= high_1m * 0.99) and (vol_ratio >= 1.1)
 
                 is_weekly = False
-                if not wk_df.empty and len(wk_df) >= 10:
+                if not wk_df.empty and len(wk_df) >= 5:
                     wk_high_prev = float(wk_df['High'].iloc[-2])
                     wk_vol_prev = float(wk_df['Volume'].iloc[-2])
-                    wk_vol_sma = float(wk_df['Volume'].rolling(10).mean().iloc[-1])
-                    is_weekly = (float(wk_df['Close'].iloc[-1]) > wk_high_prev) and (wk_vol_prev >= wk_vol_sma * 1.3)
+                    wk_vol_sma = float(wk_df['Volume'].rolling(5).mean().iloc[-1])
+                    is_weekly = (float(wk_df['Close'].iloc[-1]) > wk_high_prev) and (wk_vol_prev >= wk_vol_sma * 1.1)
 
-                is_above_200 = (curr > ema_200)
-                is_crossover_active = (ema_20 > ema_50)
-                is_pulled_back_to_20ema = (abs(curr - ema_20) / ema_20 <= 0.015) and (curr < float(df['High'].tail(5).max()))
+                is_above_200 = (curr >= ema_200 * 0.95)
+                is_crossover_active = (ema_20 >= ema_50 * 0.98)
+                is_pulled_back_to_20ema = (abs(curr - ema_20) / ema_20 <= 0.03)
                 is_crossover_pullback = bool(is_above_200 and is_crossover_active and is_pulled_back_to_20ema)
 
-                near_pullback = (abs(curr - ema_20) / ema_20 <= 0.02) or (abs(curr - ema_50) / ema_50 <= 0.02)
-                rsi_healthy = (50.0 <= rsi_val <= 60.0)
-                is_pullback_setup = bool(is_above_200 and near_pullback and rsi_healthy and (vol_ratio >= 1.1))
+                near_pullback = (abs(curr - ema_20) / ema_20 <= 0.03) or (abs(curr - ema_50) / ema_50 <= 0.03)
+                rsi_healthy = (45.0 <= rsi_val <= 68.0)
+                is_pullback_setup = bool(is_above_200 and near_pullback and rsi_healthy and (vol_ratio >= 1.05))
 
                 is_smart_multi_filter = bool(is_yearly or is_6m or is_3m or is_monthly or is_weekly or is_crossover_pullback or is_pullback_setup)
 
@@ -733,11 +733,11 @@ def scan_nifty_universe(symbols_tuple):
                     "PctFromHigh": pct_from_high,
                     "RSI_Val": rsi_val,
                     "is_smart_multi_filter": is_smart_multi_filter,
-                    "is_super_bullish": bool(is_above_200 and rsi_val >= 50),
-                    "is_vol_breakout": bool(vol_ratio >= 1.20 and chg_pct > 0),
-                    "is_near_52w": bool(pct_from_high <= 8.0),
-                    "is_support_buy": bool(rsi_val <= 42),
-                    "is_institutional_heavy": bool(vol_ratio >= 1.30 and chg_pct > 0.1)
+                    "is_super_bullish": bool(rsi_val >= 50),
+                    "is_vol_breakout": bool(vol_ratio >= 1.15 and chg_pct > 0),
+                    "is_near_52w": bool(pct_from_high <= 10.0),
+                    "is_support_buy": bool(rsi_val <= 45),
+                    "is_institutional_heavy": bool(vol_ratio >= 1.20 and chg_pct > 0.0)
                 })
             except Exception:
                 continue
@@ -745,7 +745,7 @@ def scan_nifty_universe(symbols_tuple):
         pass
     return pd.DataFrame(results)
 
-@st.cache_data(ttl=300)
+@st.cache_data(ttl=60)
 def fetch_sectoral_heatmap_data():
     sec_results = []
     sec_symbols = list(SECTOR_INDICES_DICT.values())
@@ -761,7 +761,7 @@ def fetch_sectoral_heatmap_data():
                 curr = float(df['Close'].iloc[-1])
                 prev = float(df['Close'].iloc[-2])
                 chg = ((curr - prev) / prev) * 100
-                status = "green" if chg >= 0.5 else ("red" if chg <= -0.5 else "yellow")
+                status = "green" if chg >= 0.2 else ("red" if chg <= -0.2 else "yellow")
                 sec_results.append({"name": name, "symbol": sym, "ltp": curr, "change_pct": chg, "status": status})
             except Exception:
                 continue
@@ -913,7 +913,7 @@ elif st.session_state["view_mode"] == "dashboard":
             "🔄 वॉचलिस्ट मोड निवडा:",
             ["Nifty Indices (डिफॉल्ट)", "Smart Watchlists (FII/DII/निकाल)"],
             index=1 if st.session_state["smart_watchlist_toggle"] else 0,
-            key="watchlist_selectbox_mode_master_v2"
+            key="watchlist_selectbox_mode_pure_live"
         )
         st.session_state["smart_watchlist_toggle"] = (sw_choice == "Smart Watchlists (FII/DII/निकाल)")
 
@@ -1429,9 +1429,9 @@ if st.session_state.get('data_ready', False):
             )
 
         current_date_str = datetime.now().strftime("%Y-%m-%d")
-        recent_date_1 = (datetime.now() - timedelta(days=2)).strftime("%Y-%m-%d")
-        recent_date_2 = (datetime.now() - timedelta(days=4)).strftime("%Y-%m-%d")
-        recent_date_3 = (datetime.now() - timedelta(days=6)).strftime("%Y-%m-%d")
+        recent_date_1 = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
+        recent_date_2 = (datetime.now() - timedelta(days=2)).strftime("%Y-%m-%d")
+        recent_date_3 = (datetime.now() - timedelta(days=3)).strftime("%Y-%m-%d")
 
         if "नवीन ऑर्डर्स" in deals_filter_type:
             st.markdown("#### 🏆 अधिकृत नवीन ऑर्डर्स, प्रोजेक्ट्स आणि कॉन्ट्रॅक्ट्स (Corporate Order Book):")
@@ -1982,7 +1982,7 @@ if st.session_state.get('data_ready', False):
                     "🏛️ SMC मोड:",
                     ["Demand & Supply (ON)", "Standard Trend (OFF)"],
                     index=0,
-                    key="smc_select_mode_mobile_fixed"
+                    key="smc_select_mode_mobile_pure"
                 )
                 enable_sd_mode = (smc_sel == "Demand & Supply (ON)")
                 chart_custom_height = st.slider("📏 चार्टची उंची (Chart Height):", min_value=450, max_value=950, value=650, step=50)
@@ -1991,7 +1991,7 @@ if st.session_state.get('data_ready', False):
                     "🌙 थीम:",
                     ["Dark Mode", "Light Mode"],
                     index=0,
-                    key="dark_mode_select_mobile_fixed"
+                    key="dark_mode_select_mobile_pure"
                 )
                 is_dark_theme = (dm_sel == "Dark Mode")
 
@@ -2001,7 +2001,7 @@ if st.session_state.get('data_ready', False):
                     "📊 RSI (14):",
                     ["OFF", "ON"],
                     index=0,
-                    key="rsi_select_mobile_fixed"
+                    key="rsi_select_mobile_pure"
                 )
                 enable_rsi = (rsi_sel == "ON")
             with ind_col2:
@@ -2009,7 +2009,7 @@ if st.session_state.get('data_ready', False):
                     "⚡ MACD:",
                     ["OFF", "ON"],
                     index=0,
-                    key="macd_select_mobile_fixed"
+                    key="macd_select_mobile_pure"
                 )
                 enable_macd = (macd_sel == "ON")
 
