@@ -59,7 +59,7 @@ LANG_DICT = {
         "outlook_btn": "🌙 AI नाईट मार्केट प्रेडिक्शन (AI Night Outlook)",
         "select_univ": "📊 इंडेक्स युनिव्हर्स निवडा:",
         "select_smart": "🌟 स्मार्ट फंडामेंटल युनिव्हर्स निवडा:",
-        "filter_label": "🎯 अचूक मल्टी-टाइमफ्रेम व पुलबॅक फिल्टर निवडा:",
+        "filter_label": "🎯 अचूक ट्रेडिंग फिल्टर निवडा:",
         "search_label": "🔍 NSE टिकर सर्च / सिलेक्ट करा:",
         "capital_label": "💼 भांडवल (₹):",
         "risk_label": "🛡️ कमाल रिस्क %:",
@@ -91,7 +91,7 @@ LANG_DICT = {
         "outlook_btn": "🌙 AI नाईट मार्केट प्रेडिक्शन (AI Night Outlook)",
         "select_univ": "📊 इंडेक्स यूनिवर्स चुनें:",
         "select_smart": "🌟 स्मार्ट फंडामेंटल यूनिवर्स चुनें:",
-        "filter_label": "🎯 सटीक मल्टी-टाइमफ्रेम व पुलबैक फ़िल्टर चुनें:",
+        "filter_label": "🎯 सटीक ट्रेडिंग फ़िल्टर चुनें:",
         "search_label": "🔍 NSE टिकर सर्च / सेलेक्ट करें:",
         "capital_label": "💼 कैपिटल (₹):",
         "risk_label": "🛡️ अधिकतम रिस्क %:",
@@ -123,7 +123,7 @@ LANG_DICT = {
         "outlook_btn": "🌙 AI Night Market Outlook",
         "select_univ": "📊 Select Index Universe:",
         "select_smart": "🌟 Select Smart Fundamental Universe:",
-        "filter_label": "🎯 Select Multi-TF & Pullback Filter:",
+        "filter_label": "🎯 Select Trading Filter:",
         "search_label": "🔍 Search / Select NSE Ticker:",
         "capital_label": "💼 Capital (₹):",
         "risk_label": "🛡️ Max Risk %:",
@@ -892,7 +892,7 @@ elif st.session_state["view_mode"] == "dashboard":
             "🔄 वॉचलिस्ट मोड निवडा:",
             ["Nifty Indices (डिफॉल्ट)", "Smart Watchlists (FII/DII/निकाल)"],
             index=1 if st.session_state["smart_watchlist_toggle"] else 0,
-            key="watchlist_selectbox_mode_final_live"
+            key="watchlist_selectbox_mode_clean"
         )
         st.session_state["smart_watchlist_toggle"] = (sw_choice == "Smart Watchlists (FII/DII/निकाल)")
 
@@ -1381,7 +1381,7 @@ if st.session_state.get('data_ready', False):
                 st.session_state["view_mode"] = "dashboard"
                 st.rerun()
         with b_c2:
-            st.markdown("<h3 style='margin:0; color:#38bdf8;'>📑 Exchange Live Announcements & Corporate Disclosures</h3>", unsafe_allow_html=True)
+            st.markdown("<h3 style='margin:0; color:#38bdf8;'>📑 Exchange Live Announcements & Disclosures</h3>", unsafe_allow_html=True)
             st.caption("NSE आणि BSE च्या अधिकृत पोर्टलवरून ताज्या ऑर्डर्स आणि कॉर्पोरेट अनाउन्समेंट्स थेट तपासा.")
 
         st.divider()
@@ -1390,7 +1390,7 @@ if st.session_state.get('data_ready', False):
         <div class="deal-card-blue">
             <h3 style="margin-top:0; color:#38bdf8;">🌐 अधिकृत एक्सचेंज लाइव्ह लिंक्स (Official Live Exchange Portals)</h3>
             <p style="font-size:16px; line-height:1.8;">
-                कोणत्याही कंपनीला मिळालेली नवी ऑर्डर, करार किंवा बल्क/ब्लॉक डील्स थेट एक्सचेेंजच्या सर्व्हरवरून सेकंदा सेकंदाला पाहण्यासाठी खालील अधिकृत लिंक्स वापरू शकता:
+                कोणत्याही कंपनीला मिळालेली नवी ऑर्डर, करार किंवा बल्क/ब्लॉक डील्स थेट एक्सचेंजच्या सर्व्हरवरून सेकंदा सेकंदाला पाहण्यासाठी खालील अधिकृत लिंक्स वापरू शकता:
             </p>
             <div style="margin-top:15px; display:flex; gap:15px; flex-wrap:wrap;">
                 <a href="https://www.nseindia.com/companies-listing/corporate-filings-announcements" target="_blank" style="background:#0284c7; color:white; padding:10px 20px; border-radius:8px; text-decoration:none; font-weight:700;">🔗 NSE Live Corporate Filings</a>
