@@ -59,7 +59,7 @@ LANG_DICT = {
         "outlook_btn": "🌙 AI नाईट मार्केट प्रेडिक्शन (AI Night Outlook)",
         "select_univ": "📊 इंडेक्स युनिव्हर्स निवडा:",
         "select_smart": "🌟 स्मार्ट फंडामेंटल युनिव्हर्स निवडा:",
-        "filter_label": "🎯 अचूक मोमेंटम व सेक्टर परफॉर्मर फिल्टर निवडा:",
+        "filter_label": "🎯 चार्टिंक प्रो आणि मोमेंटम फिल्टर निवडा:",
         "search_label": "🔍 NSE टिकर सर्च / सिलेक्ट करा:",
         "capital_label": "💼 भांडवल (₹):",
         "risk_label": "🛡️ कमाल रिस्क %:",
@@ -91,7 +91,7 @@ LANG_DICT = {
         "outlook_btn": "🌙 AI नाईट मार्केट प्रेडिक्शन (AI Night Outlook)",
         "select_univ": "📊 इंडेक्स यूनिवर्स चुनें:",
         "select_smart": "🌟 स्मार्ट फंडामेंटल यूनिवर्स चुनें:",
-        "filter_label": "🎯 सटीक मोमेंटम व सेक्टर परफॉर्मर फ़िल्टर चुनें:",
+        "filter_label": "🎯 चार्टिंक प्रो और मोमेंटम फ़िल्टर चुनें:",
         "search_label": "🔍 NSE टिकर सर्च / सेलेक्ट करें:",
         "capital_label": "💼 कैपिटल (₹):",
         "risk_label": "🛡️ अधिकतम रिस्क %:",
@@ -123,7 +123,7 @@ LANG_DICT = {
         "outlook_btn": "🌙 AI Night Market Outlook",
         "select_univ": "📊 Select Index Universe:",
         "select_smart": "🌟 Select Smart Fundamental Universe:",
-        "filter_label": "🎯 Select Momentum & Sector Performer Filter:",
+        "filter_label": "🎯 Select Chartink Pro & Momentum Filter:",
         "search_label": "🔍 Search / Select NSE Ticker:",
         "capital_label": "💼 Capital (₹):",
         "risk_label": "🛡️ Max Risk %:",
@@ -664,7 +664,6 @@ def scan_nifty_universe(symbols_tuple):
                 
                 ema_200 = float(df['Close'].ewm(span=200, adjust=False).mean().iloc[-1])
                 ema_20 = float(df['Close'].ewm(span=20, adjust=False).mean().iloc[-1])
-                ema_50 = float(df['Close'].ewm(span=50, adjust=False).mean().iloc[-1])
                 
                 vol_latest = float(df['Volume'].iloc[-1])
                 vol_sma_20 = float(df['Volume'].rolling(20, min_periods=1).mean().iloc[-1])
@@ -677,7 +676,7 @@ def scan_nifty_universe(symbols_tuple):
                 sig_val = float(sig.iloc[-1]) if not sig.empty else 0.0
 
                 # ==========================================
-                # 🔥 CHARTINK PRO EXACT FILTER LOGIC
+                # 🔥 CHARTINK PRO EXACT FILTER CONDITIONS
                 # ==========================================
                 cond_1 = (curr > ema_200)
                 cond_2 = (curr > ema_20)
@@ -884,7 +883,7 @@ elif st.session_state["view_mode"] == "dashboard":
             "🔄 वॉचलिस्ट मोड निवडा:",
             ["Nifty Indices (डिफॉल्ट)", "Smart Watchlists (FII/DII/निकाल)"],
             index=1 if st.session_state["smart_watchlist_toggle"] else 0,
-            key="watchlist_selectbox_mode_chartink_pro"
+            key="watchlist_selectbox_mode_chartink_fixed"
         )
         st.session_state["smart_watchlist_toggle"] = (sw_choice == "Smart Watchlists (FII/DII/निकाल)")
 
@@ -937,7 +936,7 @@ elif st.session_state["view_mode"] == "dashboard":
                 selected_pool = tuple([f"{s}.NS" for s in HIGH_ORDERS_POOL])
 
     with sc_col2:
-        # 🔥 चार्टिंक प्रो फिल्टर आता येथे अचूकपणे जोडला आहे
+        # 🔥 चार्टिंक प्रो फिल्टर आता बरोबर जोडला आहे
         filter_options = [
             "सर्व शेअर्स (All)", 
             "🔥 Chartink Pro: Institutional Breakout & Fundamental Filter",
@@ -1990,7 +1989,7 @@ if st.session_state.get('data_ready', False):
                 dragmode="pan",
                 hovermode="x unified", 
                 plot_bgcolor=plot_bg_color,
-                paper_bgcolor=paper_bgcolor,
+                paper_bgcolor=paper_bg_color,
                 font=dict(color=text_font_color, family="sans-serif"),
                 margin=dict(l=10, r=60, t=35, b=10),
                 legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
