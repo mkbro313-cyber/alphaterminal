@@ -59,7 +59,7 @@ LANG_DICT = {
         "outlook_btn": "🌙 AI नाईट मार्केट प्रेडिक्शन (AI Night Outlook)",
         "select_univ": "📊 इंडेक्स युनिव्हर्स निवडा:",
         "select_smart": "🌟 स्मार्ट फंडामेंटल युनिव्हर्स निवडा:",
-        "filter_label": "🎯 चार्टिंक प्रो आणि मोमेंटम फिल्टर निवडा:",
+        "filter_label": "🎯 अचूक मोमेंटम व सेक्टर परफॉर्मर फिल्टर निवडा:",
         "search_label": "🔍 NSE टिकर सर्च / सिलेक्ट करा:",
         "capital_label": "💼 भांडवल (₹):",
         "risk_label": "🛡️ कमाल रिस्क %:",
@@ -91,7 +91,7 @@ LANG_DICT = {
         "outlook_btn": "🌙 AI नाईट मार्केट प्रेडिक्शन (AI Night Outlook)",
         "select_univ": "📊 इंडेक्स यूनिवर्स चुनें:",
         "select_smart": "🌟 स्मार्ट फंडामेंटल यूनिवर्स चुनें:",
-        "filter_label": "🎯 चार्टिंक प्रो और मोमेंटम फ़िल्टर चुनें:",
+        "filter_label": "🎯 सटीक मोमेंटम व सेक्टर परफॉर्मर फ़िल्टर चुनें:",
         "search_label": "🔍 NSE टिकर सर्च / सेलेक्ट करें:",
         "capital_label": "💼 कैपिटल (₹):",
         "risk_label": "🛡️ अधिकतम रिस्क %:",
@@ -123,7 +123,7 @@ LANG_DICT = {
         "outlook_btn": "🌙 AI Night Market Outlook",
         "select_univ": "📊 Select Index Universe:",
         "select_smart": "🌟 Select Smart Fundamental Universe:",
-        "filter_label": "🎯 Select Chartink Pro & Momentum Filter:",
+        "filter_label": "🎯 Select Momentum & Sector Performer Filter:",
         "search_label": "🔍 Search / Select NSE Ticker:",
         "capital_label": "💼 Capital (₹):",
         "risk_label": "🛡️ Max Risk %:",
@@ -641,10 +641,13 @@ def scan_nifty_universe(symbols_tuple):
     symbols_list = list(symbols_tuple)
     try:
         data = yf.download(symbols_list, period="1y", interval="1d", group_by="ticker", progress=False, threads=True)
+        weekly_data = yf.download(symbols_list, period="2y", interval="1wk", group_by="ticker", progress=False, threads=True)
         
         for ticker in symbols_list:
             try:
                 df = data[ticker].dropna() if ticker in data else pd.DataFrame()
+                wk_df = weekly_data[ticker].dropna() if weekly_data is not None and ticker in weekly_data else pd.DataFrame()
+                
                 if df.empty or len(df) < 200:
                     continue
                 
@@ -653,11 +656,15 @@ def scan_nifty_universe(symbols_tuple):
                 if upstox_live and upstox_live > 0:
                     curr = upstox_live
 
+                prev = float(df['Close'].iloc[-2]) if len(df) >= 2 else curr
+                chg_pct = ((curr - prev) / prev) * 100
+                
                 open_p = float(df['Open'].iloc[-1])
                 high_prev = float(df['High'].iloc[-2]) if len(df) >= 2 else curr
                 
                 ema_200 = float(df['Close'].ewm(span=200, adjust=False).mean().iloc[-1])
                 ema_20 = float(df['Close'].ewm(span=20, adjust=False).mean().iloc[-1])
+                ema_50 = float(df['Close'].ewm(span=50, adjust=False).mean().iloc[-1])
                 
                 vol_latest = float(df['Volume'].iloc[-1])
                 vol_sma_20 = float(df['Volume'].rolling(20, min_periods=1).mean().iloc[-1])
@@ -670,30 +677,29 @@ def scan_nifty_universe(symbols_tuple):
                 sig_val = float(sig.iloc[-1]) if not sig.empty else 0.0
 
                 # ==========================================
-                # 🔥 CHARTINK PRO FILTER EXACT CONDITIONS
+                # 🔥 CHARTINK PRO EXACT FILTER LOGIC
                 # ==========================================
-                cond_1 = (curr > ema_200)                               # [0] daily close > [0] daily ema 200
-                cond_2 = (curr > ema_20)                                # [0] daily close > [0] daily ema 20
-                cond_3 = (curr > open_p)                                # [0] daily close > [0] daily open
-                cond_4 = (curr > high_prev)                             # [0] daily close > [1] daily high
-                cond_5 = (vol_latest > vol_sma_20 * 1.5)                # [0] daily volume > 20 SMA * 1.5
-                cond_6 = (55.0 < rsi_val < 70.0)                        # RSI between 55 and 70
-                cond_7 = (macd_val > sig_val) and (macd_val > 0)        # MACD > Signal & MACD > 0
-                cond_8 = (curr > 100) and (vol_latest > 100000)         # Price > 100 & Vol > 1 Lakh
+                cond_1 = (curr > ema_200)
+                cond_2 = (curr > ema_20)
+                cond_3 = (curr > open_p)
+                cond_4 = (curr > high_prev)
+                cond_5 = (vol_latest > vol_sma_20 * 1.5)
+                cond_6 = (55.0 < rsi_val < 70.0)
+                cond_7 = (macd_val > sig_val) and (macd_val > 0)
+                cond_8 = (curr > 100) and (vol_latest > 100000)
 
                 is_chartink_pro = bool(cond_1 and cond_2 and cond_3 and cond_4 and cond_5 and cond_6 and cond_7 and cond_8)
 
-                # Fundamental proxies / indicators
                 high_52 = float(df['High'].max())
                 pct_from_high = ((high_52 - curr) / high_52) * 100 if high_52 > 0 else 0.0
 
                 results.append({
                     "Ticker": ticker,
                     "LTP": f"₹{curr:.2f}",
-                    "Change": f"{'+' if ((curr-float(df['Close'].iloc[-2]))/float(df['Close'].iloc[-2]))*100 >= 0 else ''}{((curr-float(df['Close'].iloc[-2]))/float(df['Close'].iloc[-2]))*100:.2f}%",
+                    "Change": f"{'+' if chg_pct >= 0 else ''}{chg_pct:.2f}%",
                     "RSI": f"{rsi_val:.1f}",
                     "CurrPrice": curr,
-                    "ChgPct": ((curr-float(df['Close'].iloc[-2]))/float(df['Close'].iloc[-2]))*100,
+                    "ChgPct": chg_pct,
                     "VolRatio": vol_ratio,
                     "PctFromHigh": pct_from_high,
                     "RSI_Val": rsi_val,
@@ -878,7 +884,7 @@ elif st.session_state["view_mode"] == "dashboard":
             "🔄 वॉचलिस्ट मोड निवडा:",
             ["Nifty Indices (डिफॉल्ट)", "Smart Watchlists (FII/DII/निकाल)"],
             index=1 if st.session_state["smart_watchlist_toggle"] else 0,
-            key="watchlist_selectbox_mode_chartink"
+            key="watchlist_selectbox_mode_chartink_pro"
         )
         st.session_state["smart_watchlist_toggle"] = (sw_choice == "Smart Watchlists (FII/DII/निकाल)")
 
@@ -931,7 +937,7 @@ elif st.session_state["view_mode"] == "dashboard":
                 selected_pool = tuple([f"{s}.NS" for s in HIGH_ORDERS_POOL])
 
     with sc_col2:
-        # 🔥 चार्टिंक प्रो फिल्टर आता येथे समाविष्ट केला आहे
+        # 🔥 चार्टिंक प्रो फिल्टर आता येथे अचूकपणे जोडला आहे
         filter_options = [
             "सर्व शेअर्स (All)", 
             "🔥 Chartink Pro: Institutional Breakout & Fundamental Filter",
@@ -1984,7 +1990,7 @@ if st.session_state.get('data_ready', False):
                 dragmode="pan",
                 hovermode="x unified", 
                 plot_bgcolor=plot_bg_color,
-                paper_bgcolor=paper_bg_color,
+                paper_bgcolor=paper_bgcolor,
                 font=dict(color=text_font_color, family="sans-serif"),
                 margin=dict(l=10, r=60, t=35, b=10),
                 legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
